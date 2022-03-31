@@ -1297,10 +1297,10 @@ def plotTSP(path, x_cor, y_cor):
 if __name__ == "__main__":
   # Read a TSP file and convert x,y coordinates to distance matrix
   #GRAPH, x, y = generateDistanceMatrix('berlin52.tsp')
-  #GRAPH, x, y  = generateDistanceMatrix('ulysses16.tsp')
+  GRAPH, x, y  = generateDistanceMatrix('ulysses16.tsp')
   #GRAPH, x, y  = generateDistanceMatrix('ulysses22.tsp')
   #GRAPH, x, y  = generateDistanceMatrix('eil101.tsp')
-  GRAPH, x, y  = generateDistanceMatrix('a280.tsp')
+  #GRAPH, x, y  = generateDistanceMatrix('a280.tsp')
   #GRAPH, x, y  = generateDistanceMatrix('capp1.tsp')
   #GRAPH, x, y  = generateDistanceMatrix('capp2.tsp')
   #GRAPH_SIZE = len(GRAPH)
