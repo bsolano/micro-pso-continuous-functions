@@ -291,7 +291,7 @@ class Solver:
         # Insert the best individual into the new population (1% of the population)
         if random.uniform(0,1.0) < 1.0:
           mutated_elite = self.mutateGoodSolution(self.gbest)
-          self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest)
+          self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
     
       # for each time step (iteration)
