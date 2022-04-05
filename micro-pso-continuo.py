@@ -176,7 +176,7 @@ class Solver:
       self.particles.append(particle)
       # updates gbest if needed
       if self.gbest.getCostPBest() < particle.getCostPBest():
-        self.gbest = particle
+        self.gbest = copy.deepcopy(particle)
 
   def initPopulation(self, population_size):
     self.particles = [] # list of particles
@@ -265,17 +265,6 @@ class Solver:
     batchCounter = 0
 
     HISTORY_SIZE = 100
-    MAX_NEIGHBORS = 1
-
-    startTime = datetime.now()
-    
-    '''# updates gbest (starts with a random particle of the population)
-    randomSolution = self.graph.getRandomSolution(self.nvars, self.search_space) 
-    randomParticle = Particle(solution=randomSolution, cost=self.cost_function(*randomSolution))
-    
-    self.gbest = randomParticle'''
-    
-    eliteSolution = []
     
     epoch = 0
     while epoch < self.max_epochs:
