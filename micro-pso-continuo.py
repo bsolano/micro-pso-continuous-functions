@@ -854,53 +854,6 @@ class Solver:
     #print("Visiting status of gene:", visited[gene])
     return gene
 
-  # Generate a good solution based on the Clarke-Wright savings method
-  # Then scrambles it a bit by swapping two cities
-  def getSavingsSolution(self):
-    best = Route()
-    best.append(0)
-    savingsMatrix = self.generateSavingsMatrix()
-    first = savingsMatrix[0]
-    best.append(first.get_from_node())
-    best.append(first.get_to_node())
-    last = best[-1]
-
-    for i in range(GRAPH_SIZE - 3):
-      toNode = self.getNodeFromSavings(last, savingsMatrix, best)
-      best.append(toNode)
-      last = best[-1]
-    """  
-    # Select two random points in the savings result
-    point1 = -1
-    point2 = -1
-    while True:
-      point1 = random.randint(0, len(best)-1)
-      point2 = random.randint(0, len(best)-1)
-      if point1 != point2:
-        break
-    # Swap the contents of the two points
-    best[point1],best[point2] = best[point2],best[point1]
-    """
-    
-    # Do a reverse mutation
-    # Select two random points in the route of the parent
-    """
-    point1 = -1
-    point2 = -1
-    while True:
-      point1 = random.randint(0, len(best)-1)
-      point2 = random.randint(0, len(best)-1)
-      if point1 != point2:
-        break
-    # Inverse the genes between point1 and point2    
-    while True:
-      best[point1],best[point2] = best[point2],best[point1]
-      point1 = point1 + 1
-      point2 = point2 - 1
-      if point1 > point2:
-        break
-    """
-    return best
 
   # Calculate the objective function
   def evaluateCost(self, route):
