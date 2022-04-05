@@ -623,35 +623,6 @@ class Solver:
     return sonChromosome
 
 
-  def getConnectedGene(self, from_gene, route):
-    i = 0
-    to_gene = -1
-    while i < len(route):
-      if route[i] == from_gene and i == len(route)-1:
-        to_gene = route[0]
-        break
-      if route[i] == from_gene:
-        to_gene = route[i+1]
-        break
-      i += 1
-    if to_gene == -1:
-      print("Error!!!!!!")
-      print("Route:", route)
-      print("From gene:", from_gene)
-      print("Connected gene:", to_gene)
-      sys.exit("Error message")
-    return to_gene
-      
-  def getUnvisitedGene(self, route, visited):
-    while True:
-      point = random.randint(0, len(route)-1)
-      gene = route[point]
-      if not visited[gene]:
-        break
-    #print("Visiting status of gene:", visited[gene])
-    return gene
-
-
 # An Individual stores its route along with
 # its cost and fitness.
 class Individual:
