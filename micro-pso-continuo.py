@@ -422,93 +422,10 @@ class Solver:
     return chromosome
 
   # Crossover operator
-  # This is an ordered crossover in which the center part of the dad chromosome 
-  # is passed to the son and the left and right parts come from the mom chromosome.
-  # The right part is filled first using the right part of the mom and then
-  # the left part of the mom, while omitting the genes already inserted.
-  # Similarly, the left part is filled next, using the left part of the mom 
-  # and then the center part of the mom, while omitting the genes already inserted.
-  # Subsequently, the offspring is reverse-mutated.
-  def crossover(self, dadChromosome, momChromosome):
-    #print("")
-    
-    while True:
-      point1 = random.randint(0, len(dadChromosome)-1)
-      point2 = random.randint(0, len(dadChromosome)-1)
-      if point1 < point2 and point1 !=0 and point2 != len(dadChromosome)-1:
-        break
-    #print("Point 1: ", point1)
-    #print("Point 2: ", point2)
-    #print("Dad's chromosome: ", dadChromosome)
-    #print("Mom's chromosome: ", momChromosome)
-    
-    sonChromosome = [-1 for j in range(len(dadChromosome))]
-
-    son_center_segment = list()
-    son_left_segment = list()
-    son_right_segment = list()
-  
-    sonChromosome = [-1 for j in range(len(dadChromosome))]
-    
-    # Copy the middle section
-    for i in range(point1, point2+1):
-      son_center_segment.append(dadChromosome[i])
-
-    # Fill in the right section of the son
-    i = point2 + 1
-    j = point2 + 1
-    gene = -1
-    while i < len(sonChromosome):
-      if j == len(momChromosome):
-        j = 0
-      while j < len(momChromosome):
-        gene = momChromosome[j]
-        j=j+1
-        if gene not in son_center_segment:
-          son_right_segment.append(gene)
-          i = i + 1
-          break
-      
-      
-    # Fill in the left section of the son
-    i=0
-    j=0
-    gene = -1
-    while i < point1 and j < len(momChromosome):
-      while j < len(momChromosome):
-        gene = momChromosome[j]
-        j=j+1
-        if gene not in son_center_segment and gene not in son_right_segment:
-          son_left_segment.append(gene)
-          break
-      i = i + 1
-    
-    sonChromosome = son_left_segment + son_center_segment + son_right_segment      
-    # Swap the contents of the two points
-    ##sonChromosome[point1],sonChromosome[point2] = sonChromosome[point2],sonChromosome[point1]
-    #print("Son: ", sonChromosome)
-
-    # After the crossover do a reverse mutation
-    # Select two random points in the chromosome of the son
-    
-    point1 = -1
-    point2 = -1
-    while True:
-      point1 = random.randint(0, len(sonChromosome)-1)
-      point2 = random.randint(0, len(sonChromosome)-1)
-      if point1 != point2:
-        break
-    # Inverse the genes between point1 and point2    
-    while True:
-      sonChromosome[point1],sonChromosome[point2] = sonChromosome[point2],sonChromosome[point1]
-      point1 = point1 + 1
-      point2 = point2 - 1
-      if point1 > point2:
-        break
-    
-
-    #print("Son: ", sonChromosome)
-    #print("*******")
+  def crossover(self, dadChromosome, momChromosome, gamma=0.1):
+    alpha = [random.uniform(-gamma, 1+gamma) for _ in range(len(dadChromosome))]
+    sonChromosome = [alpha[i]*dadChromosome[i] + (1-alpha[i])*momChromosome[i] for i in range(len(dadChromosome))]
+    daugtherChromosome = [alpha[i]*momChromosome[i] + (1-alpha[i])*dadChromosome[i] for i in range(len(dadChromosome))]
     return sonChromosome
 
 
