@@ -527,33 +527,6 @@ class Solver:
     return sonChromosome
 
 
-# An Individual stores its route along with
-# its cost and fitness.
-class Individual:
-  def __init__(self, route):
-    self.route = route
-    self.cost = 0.0
-    self.fitness = 0.0
-  
-  def getRoute(self):
-    return self.route
-
-  def setRoute(self, route):
-    self.route = route
-    
-  def getFitness(self):
-    return self.fitness
-
-  def setFitness(self, fitness):
-    self.fitness = fitness
-    
-  def getCost(self):
-    return self.cost
-    
-  def setCost(self, cost):
-    self.cost = cost
-
-
 # Define Chromosome as a subclass of list
 class Chromosome(list):
   def __init__(self):
@@ -664,9 +637,7 @@ if __name__ == "__main__":
   """  
    
 
-  # pso-results.csv
-  
-  
+  # pso-results.csv  
   csvFile = open('micro-pso-continuo.csv', 'w', newline='')  
   with csvFile: 
     writer = csv.writer(csvFile)
