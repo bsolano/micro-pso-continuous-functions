@@ -2,7 +2,7 @@
 
 
 ####################################################################################
-# A Particle Swarm Optimization algorithm for finding functions optimum.
+# A Particle Swarm Optimization algorithm to find functions optimum.
 # 
 #  
 # Author: Rafael Batres
