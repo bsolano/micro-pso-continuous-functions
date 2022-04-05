@@ -167,12 +167,16 @@ class Solver:
           bestSolutions = list(solutions)
         del solutions[:]
     
+    self.gbest = bestSolutions[0]
     # initialization of all particles
     for solution in bestSolutions:
       # creates a new particle
       particle = Particle(solution=solution, cost=self.cost_function(*solution))
       # add the particle
       self.particles.append(particle)
+      # updates gbest if needed
+      if self.gbest.getCostPBest() < particle.getCostPBest():
+        self.gbest = particle
 
 
   def evaluateSolutionsDiversity(self, solutions):
@@ -236,11 +240,11 @@ class Solver:
 
     startTime = datetime.now()
     
-    # updates gbest (starts with a random particle of the population)
+    '''# updates gbest (starts with a random particle of the population)
     randomSolution = self.graph.getRandomSolution(self.nvars, self.search_space) 
     randomParticle = Particle(solution=randomSolution, cost=self.cost_function(*randomSolution))
     
-    self.gbest = randomParticle
+    self.gbest = randomParticle'''
     
     eliteSolution = []
     
