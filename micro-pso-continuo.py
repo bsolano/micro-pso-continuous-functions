@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
+import numpy as np
 
     
 # class that represents a particle
@@ -167,7 +168,7 @@ class Solver:
           bestSolutions = list(solutions)
         del solutions[:]
     
-    self.gbest = bestSolutions[0]
+    self.gbest = None
     # initialization of all particles
     for solution in bestSolutions:
       # creates a new particle
@@ -175,7 +176,9 @@ class Solver:
       # add the particle
       self.particles.append(particle)
       # updates gbest if needed
-      if self.gbest.getCostPBest() < particle.getCostPBest():
+      if self.gbest is None:
+        self.gbest = copy.deepcopy(particle)
+      elif self.gbest.getCostPBest() > particle.getCostPBest():
         self.gbest = copy.deepcopy(particle)
 
   def initPopulation(self, population_size):
@@ -300,7 +303,7 @@ class Solver:
             particle.history.pop(0)
           
           bestNeighbor = self.mutateGoodSolution(particle.getCurrentSolution())
-          bestNeighborCost = self.graph.evaluateCost(bestNeighbor)
+          bestNeighborCost = self.cost_function(*bestNeighbor)
           
           newSolution = particle.getCurrentSolution()[:]
 
@@ -318,7 +321,7 @@ class Solver:
             newSolution = self.crossover(list(newSolution), dissimilar_particle.getPBest())
 
             # gets cost of the current solution
-          newSolutionCost = self.graph.evaluateCost(newSolution)
+          newSolutionCost = self.cost_function(*newSolution)
 
           if newSolutionCost < bestNeighborCost:
             bestNeighbor = newSolution[:]
@@ -342,7 +345,7 @@ class Solver:
 
           # check if new solution is gbest solution         
           if particle.getCurrentSolutionCost() < gbestCost:
-            self.gbest = particle
+            self.gbest = copy.deepcopy(particle)
            
         if batchCounter > batchSize:
           #print("Sum of acceptance probabilities:", sumAcceptanceProbabilities)
@@ -414,26 +417,8 @@ class Solver:
 
 
   # Use reverse mutation for elite and savings solutions
-  def mutateGoodSolution(self, elite_solution):
-    chromosome = elite_solution[:]
-
-    point1 = -1
-    point2 = -1
-    while True:
-      point1 = random.randint(0, len(chromosome)-1)
-      point2 = random.randint(0, len(chromosome)-1)
-      if point1 != point2:
-        break
-    # Swap the contents of the two points
-    #chromosome[point1],chromosome[point2] = chromosome[point2],chromosome[point1]
-
-    # Inverse the genes between point1 and point2
-    while True:
-      chromosome[point1],chromosome[point2] = chromosome[point2],chromosome[point1]
-      point1 = point1 + 1
-      point2 = point2 - 1
-      if point1 > point2:
-        break
+  def mutateGoodSolution(self, elite_solution, mu=0.01, sigma=0.1):
+    chromosome = [elite_solution[i]+sigma*random.random() if random.random() <= mu else elite_solution[i] for i in range(len(elite_solution))]
     return chromosome
 
   # Crossover operator
