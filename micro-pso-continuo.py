@@ -310,7 +310,7 @@ class Solver:
             largest_dist = 0
             for neighbor_particle in self.particles:
               sol = neighbor_particle.getPBest()
-              dist = hamming(gbest, sol)*len(sol)
+              dist = euclidean(gbest, sol)
 
               if dist > largest_dist:
                 largest_dist = dist
@@ -413,7 +413,7 @@ class Solver:
       return boltzmannProb
 
 
-# Use reverse mutation for elite and savings solutions
+  # Use reverse mutation for elite and savings solutions
   def mutateGoodSolution(self, elite_solution):
     chromosome = elite_solution[:]
 
@@ -436,7 +436,7 @@ class Solver:
         break
     return chromosome
 
-# Crossover operator with mutation
+  # Crossover operator
   # This is an ordered crossover in which the center part of the dad chromosome 
   # is passed to the son and the left and right parts come from the mom chromosome.
   # The right part is filled first using the right part of the mom and then
