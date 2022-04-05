@@ -855,53 +855,6 @@ class Solver:
     return gene
 
 
-  # Calculate the objective function
-  def evaluateCost(self, route):
-    routeSize = len(route)
-    
-    # Determine the cost of traversing the cities
-    first = -1
-    second = -1
-    last = -1
-    cost = 0.0
-    #print(routeSize)
-    #print(route)
-    i = 0
-    while routeSize > 1 and i < routeSize-1:
-      first = route[i]
-      second = route[i+1]
-      cost = cost + GRAPH[first][second]
-      i = i + 1
-    # Complete Hamiltonian circuit
-    last = route[routeSize-1]
-    first = route[0]
-    cost = cost + GRAPH[last][first]
-    return cost  
-
-  def generateSavingsMatrix(self):
-    savingsMatrix = []
-    for i in range(1, GRAPH_SIZE):
-      for j in range(1, GRAPH_SIZE):
-        savings = GRAPH[i][0] + GRAPH[0][j] - GRAPH[i][j]
-        # saving = CWSA_mtx[i,-1] + CWSA_mtx[j,-1] - CWSA_mtx[i,j]
-        savingsMatrix.append(Savings(i, j, savings))
-    savingsMatrix = sorted(savingsMatrix, reverse=True)
-    return savingsMatrix
-    # sorted(student_objects, key=lambda student: student.age)
-
-  def getNodeFromSavings(self, last, savings_matrix  = [], best = []):
-    for i in range(len(savings_matrix)):
-      node = savings_matrix[i]
-      fromNode = node.get_from_node()
-      toNode = node.get_to_node()
-      #print("Last: ", last)
-      #print("fromNode:", fromNode)
-      #print("toNode:", toNode)
-      if fromNode == last and toNode not in best:
-        return toNode
-
-      
-
 # An Individual stores its route along with
 # its cost and fitness.
 class Individual:
