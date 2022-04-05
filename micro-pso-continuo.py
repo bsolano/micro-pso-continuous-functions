@@ -416,7 +416,7 @@ class Solver:
       return boltzmannProb
 
 
-  # Use reverse mutation for elite and savings solutions
+  # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
   def mutateGoodSolution(self, elite_solution, mu=0.01, sigma=0.1):
     chromosome = [elite_solution[i]+sigma*random.random() if random.random() <= mu else elite_solution[i] for i in range(len(elite_solution))]
     return chromosome
