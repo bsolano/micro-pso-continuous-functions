@@ -178,6 +178,35 @@ class Solver:
       if self.gbest.getCostPBest() < particle.getCostPBest():
         self.gbest = particle
 
+  def initPopulation(self, population_size):
+    self.particles = [] # list of particles
+    solutions = Particle.getRandomSolutions(self.nvars, self.search_space, population_size)
+    self.population_size = population_size
+    
+    # checks if exists any solution
+    if not solutions:
+      print('Initial population empty! Try run the algorithm again...')
+      sys.exit(1)
+
+    # Select the best random population among 5 populations
+    bestSolutions = list(solutions)
+    bestCost = self.evaluateSolutionsAverageCost(solutions)    
+    
+    for _ in range(5):
+      solutions = Particle.getRandomSolutions(self.nvars, self.search_space, self.population_size)
+      cost = self.evaluateSolutionsAverageCost(solutions)
+      if cost < bestCost:
+        bestCost = cost
+        bestSolutions = list(solutions)
+      del solutions[:]
+    
+    # creates the particles and initialization of swap sequences in all the particles
+    for solution in bestSolutions:
+      # creates a new particle
+      particle = Particle(solution=solution, cost=self.cost_function(*solution))
+      # add the particle
+      self.particles.append(particle)
+
 
   def evaluateSolutionsDiversity(self, solutions):
     simSum = 0
@@ -256,15 +285,13 @@ class Solver:
 
       eliteCost = sys.maxsize
 
-      print("Particles: ", len(self.particles))
       if epoch > 0:
+        self.initPopulation(self.population_size)
+        print("Particles: ", len(self.particles))
         # Insert the best individual into the new population (1% of the population)
-        #for i in range(population_size):
-        #print("Elite:", eliteSolution)
         if random.uniform(0,1.0) < 1.0:
-          mutated_elite = self.mutateGoodSolution(eliteSolution)
-          self.particles[0]  = Particle(mutated_elite, eliteCost)
-          #self.particles[0]  = Particle(eliteSolution, eliteCost)
+          mutated_elite = self.mutateGoodSolution(self.gbest)
+          self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest)
           print("Inserted elite solution!")
     
       # for each time step (iteration)
