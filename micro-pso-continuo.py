@@ -623,66 +623,6 @@ class Solver:
     return sonChromosome
 
 
-  # The alternative edge crossover
-  def aexcrossover(self, dadRoute, momRoute):
-    
-    sonRoute = [-1 for j in range(len(dadRoute))]
-    
-    visited = [False for i in range(len(dadRoute))]
-    
-    fromGeneInDad = dadRoute[0]
-    sonRoute[0] = fromGeneInDad
-    connectedGeneInDad = self.getConnectedGene(fromGeneInDad, dadRoute)
-    sonRoute[1] = connectedGeneInDad
-    visited[fromGeneInDad] = True
-    visited[connectedGeneInDad] = True
-    i = 2
-    
-    while i < len(dadRoute):
-      fromGeneInMom = connectedGeneInDad
-      connectedGeneInMom = self.getConnectedGene(fromGeneInMom, momRoute)
-      if visited[connectedGeneInMom]:
-        #print("Gene in Mom already visited:", connectedGeneInMom)
-        connectedGeneInMom = self.getUnvisitedGene(momRoute, visited)
-        #print("Randomly selected momÂ´s gene:", connectedGeneInMom)
-      sonRoute[i] = connectedGeneInMom
-      #print("Connected gene in Mom:", connectedGeneInMom)
-      visited[connectedGeneInMom] = True
-      i += 1
-      fromGeneInDad = connectedGeneInMom
-      connectedGeneInDad = self.getConnectedGene(fromGeneInDad, dadRoute)
-      if visited[connectedGeneInDad]:
-        #print("Gene in Dad already visited:", connectedGeneInDad)
-        connectedGeneInDad = self.getUnvisitedGene(dadRoute, visited)
-        #print("Randomly selected dad's gene:", connectedGeneInDad)
-      sonRoute[i] = connectedGeneInDad
-      #print("Connected gene in Dad:", connectedGeneInDad)
-      visited[connectedGeneInDad] = True
-      i += 1
-
-    #print("Son:", sonRoute)
-    
-    missingGenes = False
-    for j in range(0,  len(dadRoute)-1):
-      if j not in sonRoute:
-        #print(j, " is missing")
-        missingGenes = True
-    if missingGenes:
-      sys.exit("Gene is missing in son:")
-      
-    # Select two random points in the route of the son
-    point1 = -1
-    point2 = -1
-    while True:
-      point1 = random.randint(0, len(sonRoute)-1)
-      point2 = random.randint(0, len(sonRoute)-1)
-      if point1 != point2:
-        break
-        
-    # Swap the contents of the two points
-    #sonRoute[point1],sonRoute[point2] = sonRoute[point2],sonRoute[point1]
-    return sonRoute
-
   def getConnectedGene(self, from_gene, route):
     i = 0
     to_gene = -1
