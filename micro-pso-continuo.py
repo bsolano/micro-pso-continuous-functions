@@ -494,20 +494,6 @@ class Solver:
       #print("Worse solution accepted ...")
       return boltzmannProb
 
-  # Reverse mutation
-  def mutate(self, parent, point1, point2):
-    chromosome = parent[:]
-
-    # Inverse the genes between point1 and point2    
-    while True:
-      chromosome[point1],chromosome[point2] = chromosome[point2],chromosome[point1]
-      point1 = point1 + 1
-      point2 = point2 - 1
-      # Greater or equal than
-      if point1 >= point2:
-        break
-      
-    return chromosome
 
 # Use reverse mutation for elite and savings solutions
   def mutateGoodSolution(self, elite_solution):
