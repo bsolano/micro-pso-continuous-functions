@@ -546,14 +546,6 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  #pso = PSO(graph, iterations=5000, maxEpochs=1, size_population=150, beta=0.1, alfa=0.9)
-  
-  """
-  pso = PSO(graph, iterations=1000, maxEpochs=50, size_population=15, beta=0.05, alfa=0.9)
-  pso.run()
-  """
-
-  
   results = ["Solution", "Cost", "Comp. time"]
   fileoutput = []
   fileoutput.append(results)
