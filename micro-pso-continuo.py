@@ -572,92 +572,9 @@ if __name__ == "__main__":
     results.append(epoch)
     fileoutput.append(results)
   
-
-  """
-  results = ["alpha", "beta", "mean"]
-  fileoutput = []
-  fileoutput.append(results)
-  alfa_value = 0.1
-  while alfa_value < 1:
-    beta_value = 0.1
-    while beta_value < 1:
-      results = []
-      cost_sum = 0.0
-      runs = 0
-      for i in range(10):
-        runs += 1
-        pso = Solver(graph, iterations=1000, maxEpochs=50, size_population=15, beta=beta_value, alfa=alfa_value)
-        pso.run()
-        cost_sum = cost_sum + pso.getGBest().getCostPBest()
-      i = 0
-      average_cost = cost_sum / runs
-      results.append(alfa_value)
-      results.append(beta_value)
-      results.append(average_cost)
-      fileoutput.append(results)
-      beta_value += 0.1
-    alfa_value += 0.1
-  """
-  
-  """
-  # the alpha and beta values are obtained with LHS in R"
-  results = ["alpha", "beta", "cost", "comp. time", "epoch"]
-  fileoutput = []
-  fileoutput.append(results)
-  #alfa_values = [0.33083770, 0.81286553, 0.28994727, 0.62146038, 0.52186326, 0.17224262, 0.02020398, 0.78311170, 0.90367650, 0.49015838]
-  #beta_values = [0.6197808, 0.89753027, 0.11981711, 0.72693961, 0.40612212, 0.94802543, 0.57793579, 0.23444987, 0.39597191, 0.09485114]
-  alfa_values = [0.52966316, 0.4145423, 0.19379634, 0.87264983, 0.97362117, 0.06562221, 0.65973607, 0.2151281, 0.461971, 0.38040526, 0.77591784, 0.12027035, 0.82232354, 0.32580516, 0.58453551, 0.73574494, 0.92142149, 0.26890176, 0.61401872, 0.0111655]
-  beta_values = [0.58285168, 0.35864099, 0.85454185, 0.13890171, 0.49436501, 0.23125492, 0.72400869, 0.0334176, 0.98079264, 0.82039207, 0.52108801, 0.40230925, 0.33304859, 0.15509154, 0.05296365, 0.92091665, 0.78477693, 0.62063391, 0.25896396, 0.65795874]
-  for i in range(20):
-    alfa_value = alfa_values[i]
-    beta_value = beta_values[i]
-    cost_sum = 0.0
-    runs = 0
-    print("alfa: ", alfa_value, "beta: ", beta_value)
-    for i in range(20):
-      results = []
-      runs += 1
-      pso = Solver(graph, iterations=1000, maxEpochs=50, size_population=15, beta=beta_value, alfa=alfa_value)
-      start_time = datetime.now()
-      pso.run()
-      #cost_sum = cost_sum + pso.getGBest().getCostPBest()
-      results.append(alfa_value)
-      results.append(beta_value)
-      results.append(pso.getGBest().getCostPBest())
-      epoch = pso.getEpoch()
-      dt = datetime.now() - start_time
-      ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-      results.append(ms)
-      results.append(epoch)
-      fileoutput.append(results)
-    #average_cost = cost_sum / runs
-    #results.append(alfa_value)
-    #results.append(beta_value)
-    #results.append(average_cost)
-  """  
-   
-
   # pso-results.csv  
   csvFile = open('micro-pso-continuo.csv', 'w', newline='')  
   with csvFile: 
     writer = csv.writer(csvFile)
     writer.writerows(fileoutput)
   csvFile.close()
-  
-
-  # shows the global best particle
-  ##bestPath = pso.getGBest().getPBest()
-  ##print('gbest: %s | cost: %d\n' % (bestPath, pso.getGBest().getCostPBest()))
-  ##plotPoints(x, y)
-  ##plotTSP(bestPath, x, y)
-  
-  '''
-  # random graph
-  print('Random graph...')
-  random_graph = CompleteGraph(amount_vertices=20)
-  random_graph.generates()
-  pso_random_graph = PSO(random_graph, iterations=10000, size_population=10, beta=1, alfa=1)
-  pso_random_graph.run()
-  print('gbest: %s | cost: %d\n' % (pso_random_graph.getGBest().getPBest(), 
-          pso_random_graph.getGBest().getCostPBest()))
-  '''
