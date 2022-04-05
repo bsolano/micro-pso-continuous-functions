@@ -272,8 +272,6 @@ class Solver:
       print("Alfa = ", self.alfa, "Beta = ", self.beta)
       convergencePerEpoch = []
 
-      eliteCost = sys.maxsize
-
       if epoch > 0:
         self.initPopulation(self.population_size)
         print("Particles: ", len(self.particles))
@@ -288,77 +286,36 @@ class Solver:
         convergencePerIteration = []
         batchCounter = batchCounter + 1
         
-        # updates gbest (best particle of the population)
-        #self.gbest = min(self.particles, key=attrgetter('pbestCost'))
-        #costVariance = (self.particles, key=attrgetter('pbestCost'))
         averageCost = statistics.mean(particle.pbestCost for particle in self.particles)
         costStd = statistics.pstdev(particle.pbestCost for particle in self.particles)
-
 
         # for each particle in the swarm
         for particle in self.particles:
           previousCost = particle.getCurrentSolutionCost()
           
           particle.clearVelocity() # cleans the speed of the particle
-          #velocity = []
-          #velocity_alfa = []
-          # what is the difference btn. copy.copy and list?
           gbest = list(self.gbest.getPBest()) # gets solution of the gbest solution
-          #pbest = particle.getPBest()[:] # copy of the pbest solution
-          ##newSolution = particle.getCurrentSolution()[:] # gets copy of the current solution of the particle
-          
-          # the previous solution
-          previousSolution = particle.getCurrentSolution()[:]
           
           if len(particle.history) == HISTORY_SIZE:
             particle.history.pop(0)
           
           bestNeighbor = self.mutateGoodSolution(particle.getCurrentSolution())
-          #bestNeighbor = particle.getCurrentSolution()[:]
           bestNeighborCost = self.graph.evaluateCost(bestNeighbor)
           
-          """
-          if previousCost < bestNeighborCost:
-            bestNeighbor = previousSolution[:]
-            bestNeighborCost = previousCost
-          """
-
-            
           newSolution = particle.getCurrentSolution()[:]
 
-
-          #random_particle = random.choice(self.particles)
-          
-          """
-          if random.random() <= (1.0 - self.alfa - self.beta):
-            newSolution = self.crossover(list(newSolution), previousSolution)
-          elif random.random() <= self.beta:
-            newSolution = self.crossover(list(newSolution), self.gbest.getPBest())
-          elif random.random() <= self.alfa:
-            newSolution = self.crossover(list(gbest), random_particle.getPBest())
-          """  
           if random.random() <= self.beta:
             newSolution = self.crossover(list(newSolution), self.gbest.getPBest())
           elif random.random() <= self.alfa:
             largest_dist = 0
-            #less_common = len(gbest)
             for neighbor_particle in self.particles:
               sol = neighbor_particle.getPBest()
               dist = hamming(gbest, sol)*len(sol)
-              #dist = self.hammingDistance(gbest, sol)
-              #sim = self.cosine_similarity(gbest, sol)
-              #dist = (1 - sim)*52
-              #common = self.commonEdges(gbest, sol)
-              #if common < less_common:
-              #sim = self.jaro_distance(gbest, sol)
-              #dist = 1 - sim
-              #dist = self.levenshteinDistanceDP(gbest, sol)
+
               if dist > largest_dist:
                 largest_dist = dist
-                #less_common = common
                 dissimilar_particle = neighbor_particle
             newSolution = self.crossover(list(newSolution), dissimilar_particle.getPBest())
-            #newSolution = self.crossover(list(gbest), random_particle.getPBest())
 
             # gets cost of the current solution
           newSolutionCost = self.graph.evaluateCost(newSolution)
@@ -374,37 +331,19 @@ class Solver:
             particle.setCostCurrentSolution(bestNeighborCost)
             particle.history.append(bestNeighbor)
 
-
-          #"""
-
           # checks if new solution is pbest solution
           pbCost =  particle.getCostPBest()
           
-          """
-          if particle.getCurrentSolutionCost() < pbCost:
-            particle.setPBest(particle.getCurrentSolution())
-            particle.setCostPBest(particle.getCurrentSolutionCost())
-          """  
           if bestNeighborCost < pbCost:
             particle.setPBest(bestNeighbor)
             particle.setCostPBest(bestNeighborCost)
 
-            #temperature = temperature + (pbCost - newSolutionCost) / (math.log(rnd))
-          
           gbestCost = self.gbest.getCostPBest()
-                   
-          
-            
-            # Using the value of the Boltzmann constant
-          
-          # check if new solution is gbest solution
-         
+
+          # check if new solution is gbest solution         
           if particle.getCurrentSolutionCost() < gbestCost:
             self.gbest = particle
-
            
-        eliteSolution = self.getGBest().getPBest()[:]
-        eliteCost = self.gbest.getCostPBest()
         if batchCounter > batchSize:
           #print("Sum of acceptance probabilities:", sumAcceptanceProbabilities)
           print(t, "Gbest cost = ", self.gbest.getCostPBest())
@@ -435,7 +374,6 @@ class Solver:
       
       if std == 0:
         break
-
     
     print("What's going on?")
     df = pd.DataFrame()
@@ -454,15 +392,6 @@ class Solver:
       plt.plot(df['Epoch'], df['Best cost'])
       #plt.show()
 
-    """
-    csvFile = open('pso-convergence.csv', 'w', newline='')  
-    with csvFile: 
-         writer = csv.writer(csvFile)
-         writer.writerows(convergenceData)
-    csvFile.close()
-    print("Elapsed time: ", self.elapsedTime(startTime))
-    """ 
-    
   def acceptanceProbability(self, previous_solution, new_solution, temperature, boltzmann):
     # If the new solution is better, accept it
     if new_solution < previous_solution:
