@@ -236,12 +236,13 @@ class Solver:
 
     startTime = datetime.now()
     
-    # updates gbest (best particle of the population)
-    #self.gbest = min(self.particles, key=attrgetter('pbestCost'))
-    self.gbest = self.particles[0]
+    # updates gbest (starts with a random particle of the population)
+    randomSolution = self.graph.getRandomSolution(self.nvars, self.search_space) 
+    randomParticle = Particle(solution=randomSolution, cost=self.cost_function(*randomSolution))
+    
+    self.gbest = randomParticle
     
     eliteSolution = []
-    
     
     epoch = 0
     while epoch < self.max_epochs:
@@ -261,8 +262,6 @@ class Solver:
           self.particles[0]  = Particle(mutated_elite, eliteCost)
           #self.particles[0]  = Particle(eliteSolution, eliteCost)
           print("Inserted elite solution!")
-          
-        
     
       # for each time step (iteration)
       for t in range(self.iterations):
