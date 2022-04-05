@@ -927,36 +927,12 @@ class Individual:
     
   def setCost(self, cost):
     self.cost = cost
-    
-# Test code begins
-
-class Savings(object):
-  def __init__(self, from_node, to_node, savings_value):
-    self.from_node = from_node
-    self.to_node = to_node
-    self.savings_value = savings_value
-  
-  def get_from_node(self):
-    return self.from_node
-
-  def get_to_node(self):
-    return self.to_node
-        
-  def __repr__(self):
-    return repr((self.from_node, self.to_node, self.savings_value))
-    
-  def __lt__(self, other):
-    return self.savings_value < other.savings_value
-  
-  def __eq__(self, other):
-    return self.savings_value == other.savings_value
 
 
 # Define Chromosome as a subclass of list
 class Chromosome(list):
   def __init__(self):
     self.elements = []
-
 
 
 # Nest nearest integer
