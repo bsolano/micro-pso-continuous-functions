@@ -428,7 +428,7 @@ if __name__ == "__main__":
     fileoutput.append(results)
   
   # pso-results.csv  
-  csvFile = open('micro-pso-continuo.csv', 'w', newline='')  
+  csvFile = open('micro-pso-continuous.csv', 'w', newline='')  
   with csvFile: 
     writer = csv.writer(csvFile)
     writer.writerows(fileoutput)
