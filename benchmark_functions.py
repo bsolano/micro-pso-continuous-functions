@@ -20,4 +20,4 @@ def biggs_exp4(x1, x2, x3, x4):
         yi = exp(-ti) - 5*exp(-10*ti)
         sum += ( x3*exp(-ti*x1) - x4*exp(-ti*x2) - yi )**2
     return sum
-    #return sum([(x3 * exp(-0.1*i*x1) - x4*exp(-0.1*i*x2) - (exp(-0.1*i) - 5*exp(-10*0.1*i)))**2 for i in range(1,11)])
+    #return sum([(x3 * exp(-0.1*i*x1) - x4*exp(-0.1*i*x2) - (exp(-0.1*i) - 5*exp(-a10*0.1*i)))**2 for i in range(1,11)])
