@@ -395,26 +395,6 @@ class Solver:
       plt.plot(df['Epoch'], df['Best cost'])
       #plt.show()
 
-  def acceptanceProbability(self, previous_solution, new_solution, temperature, boltzmann):
-    # If the new solution is better, accept it
-    if new_solution < previous_solution:
-      return 1.0
-    elif temperature == 0:
-      return 0.0
-    # if there is no change then accept the bad solution
-    #elif new_solution == previous_solution:
-    #  return 0.0
-    # If the new solution is worse, calculate an acceptance probability
-    else:
-      try:
-        boltzmannProb = math.exp((previous_solution - new_solution) / (temperature * boltzmann))
-      except OverflowError:
-        boltzmannProb = float('inf')
-      
-      #print("Boltzmann probability", boltzmannProb)
-      #print("Worse solution accepted ...")
-      return boltzmannProb
-
 
   # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
   def mutateGoodSolution(self, elite_solution, mu=0.01, sigma=0.1):
@@ -433,15 +413,6 @@ class Solver:
 class Chromosome(list):
   def __init__(self):
     self.elements = []
-
-
-# Nest nearest integer
-def nint(number):
-  return int(number + (0.5 if number > 0 else -0.5))
-  
-# Calculate Euclidean distance for one location
-def calculate_distance(x1, y1, x2, y2):
-    return math.sqrt(math.pow((x1 - x2), 2) + math.pow((y1 - y2), 2))
 
 
 if __name__ == "__main__":
