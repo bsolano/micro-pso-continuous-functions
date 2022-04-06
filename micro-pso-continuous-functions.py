@@ -11,12 +11,10 @@
 # Date: June 6, 2018 - April 2022
 ####################################################################################
 
-from operator import attrgetter
-import random, sys, time, copy
+import random, sys, copy
 import random
 import copy
 import csv
-import math
 import statistics
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -25,7 +23,6 @@ import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
-import numpy as np
 
     
 # class that represents a particle
@@ -242,13 +239,6 @@ class Solver:
   def getGBest(self):
     return self.gbest
 
-  
-  # returns the elapsed milliseconds since the start of the program
-  def elapsedTime(self, start_time):
-    dt = datetime.now() - start_time
-    ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-    return ms
-  
   def setEpoch(self, last_epoch):
     self.last_epoch = last_epoch
   
