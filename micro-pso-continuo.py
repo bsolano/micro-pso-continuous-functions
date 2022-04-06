@@ -280,7 +280,7 @@ class Solver:
         print("Particles: ", len(self.particles))
         # Insert the best individual into the new population (1% of the population)
         if random.uniform(0,1.0) < 1.0:
-          mutated_elite = self.mutateGoodSolution(self.gbest)
+          mutated_elite = self.mutateGoodSolution(self.gbest.getPBest())
           self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
     
@@ -451,7 +451,7 @@ if __name__ == "__main__":
   results = ["Solution", "Cost", "Comp. time"]
   fileoutput = []
   fileoutput.append(results)
-  function = 'cross_in_tray'
+  function = 'drop_in_wave'
   for i  in range(20):
     results = []
     pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=200, population_size=10, beta=0.29, alfa=0.12)
