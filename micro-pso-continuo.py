@@ -422,8 +422,8 @@ if __name__ == "__main__":
   results = ["Solution", "Cost", "Comp. time"]
   fileoutput = []
   fileoutput.append(results)
-  function = 'drop_in_wave'
-  for i  in range(20):
+  function = 'biggs_exp4'
+  for i  in range(2):
     results = []
     pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=200, population_size=10, beta=0.29, alfa=0.12)
     start_time = datetime.now()
