@@ -21,25 +21,27 @@ from datetime import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
-
+from benchmark_functions import *
+from inspect import signature
 
 
 # PSO algorithm
 class PSO:
 
 
-  def __init__(self, graph, iterations, size_population, alfa=1, beta=1):
-    self.graph = graph # the graph
+  def __init__(self, cost_function, search_space, iterations, population_size, inertia=0.8, particle_confidence=0.1, swarm_confidence=0.1):
+    self.cost_function = cost_function # the cost function
+    self.nvars = len(signature(cost_function).parameters) # number of variables in the cost function
+    self.search_space = search_space # interval of the cost function
     self.iterations = iterations # max of iterations
-    self.populationSize = size_population # size population
-    self.particles = Chromosome() # list of particles
-    self.beta = beta # the probability that all swap operators in swap sequence (gbest - x(t-1))
-    self.alfa = alfa # the probability that all swap operators in swap sequence (pbest - x(t-1))
+    self.population_size = population_size # size population
+    self.particles = [] # list of particles
+    self.inertia = inertia
+    self.p_confidence = particle_confidence
+    self.s_confidence = swarm_confidence
 
-    #graph_size = 5
-    
     # initialized with a group of random particles (solutions)
-    solutions = self.graph.getRandomPaths(self.populationSize)
+    solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
        
     # checks if exists any solution
     if not solutions:
@@ -49,63 +51,30 @@ class PSO:
     # Select the best random population among 5 populations
     bestSolutions = list(solutions)
     bestCost = self.evaluateSolutionsAverageCost(solutions)
-    for i in range(5):
-      solutions = self.graph.getRandomPaths(self.populationSize)
+    for _ in range(5):
+      solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
       cost = self.evaluateSolutionsAverageCost(solutions)
       if cost < bestCost:
         bestCost = cost
         bestSolutions = list(solutions)
       del solutions[:]
     
-    ###bestSolutions[0] = goodSolution
     # creates the particles and initialization of swap sequences in all the particles
     for solution in bestSolutions:
       # creates a new particle
-      particle = Particle(solution=solution, cost=graph.evaluateCost(solution))
+      particle = Particle(solution=solution, cost=self.cost_function(*solution))
       # add the particle
       self.particles.append(particle)
-    
 
-    # updates "populationSize"
-    self.populationSize = len(self.particles)
+    self.gbest = None
 
-  def initPopulation(self, population_size):
-    self.particles = Chromosome() # list of particles
-    solutions = self.graph.getRandomPaths(population_size)
-    self.populationSize = population_size
 
-    
-   
-    # checks if exists any solution
-    if not solutions:
-      print('Initial population empty! Try run the algorithm again...')
-      sys.exit(1)
-
-    # Select the best random population among 5 populations
-    bestSolutions = list(solutions)
-    bestCost = self.evaluateSolutionsAverageCost(solutions)
-    for i in range(5):
-      solutions = self.graph.getRandomPaths(self.populationSize)
-      cost = self.evaluateSolutionsAverageCost(solutions)
-      if cost < bestCost:
-        bestCost = cost
-        bestSolutions = list(solutions)
-      del solutions[:]
-    
-    
-    # creates the particles and initialization of swap sequences in all the particles
-    for solution in bestSolutions:
-      # creates a new particle
-      particle = Particle(solution=solution, cost=graph.evaluateCost(solution))
-      # add the particle
-      self.particles.append(particle)    
-    
   def evaluateSolutionsAverageCost(self, solutions):
   
     totalCost = 0.0
     i = 0
     for solution in solutions:
-      cost = self.evaluateCost(solution)
+      cost = self.cost_function(*solution)
       totalCost += cost
       i+=1
     averageCost = totalCost / float(i)
@@ -121,7 +90,6 @@ class PSO:
   def getGBest(self):
     return self.gbest
 
-  
   # returns the elapsed milliseconds since the start of the program
   def elapsedTime(self, start_time):
     dt = datetime.now() - start_time
@@ -141,103 +109,61 @@ class PSO:
     bestCostArray = []
     bestCostSampling = []
 
-
     batchSize = 100 # save data every n iterations
     batchCounter = 0
-    iteration = 0
     
     startTime = datetime.now()
     
     # updates gbest (best particle of the population)
-    self.gbest = self.particles[0]
+    for particle in self.particles:
+      if self.gbest is None:
+        self.gbest = copy.deepcopy(particle)
+      elif self.gbest.getCostPBest() > particle.getCostPBest():
+        self.gbest = copy.deepcopy(particle)
         
-      # for each time step (iteration)
+    # for each time step (iteration)
     iterations = self.iterations
     t = 0
     while t < iterations:
     #for t in range(self.iterations):
       convergencePerIteration = []
       batchCounter = batchCounter + 1
-      
+
       # for each particle in the swarm
       for particle in self.particles:
-        previousCost = particle.getCurrentSolutionCost()
-        particle.clearVelocity() # cleans the speed of the particle
-        velocity = []
-
+        #previousCost = particle.getCurrentSolutionCost()
+        velocity = particle.getVelocity()
         gbest = list(self.gbest.getPBest()) # gets solution of the gbest solution
         pbest = particle.getPBest()[:] # copy of the pbest solution
-        newSolution = particle.getCurrentSolution()[:] # gets copy of the current solution of the particle
-        
-
-        # generates all swap operators to calculate (pbest - x(t-1))
-        for i in range(self.graph.graphSize):
-          if newSolution[i] != pbest[i]:
-            # generates swap operator
-            swapOperation = (i, pbest.index(newSolution[i]), self.alfa)
-            # append swap operator in the list of velocity
-            velocity.append(swapOperation)
-            # makes the swap           
-            aux = pbest[swapOperation[0]]
-            pbest[swapOperation[0]] = pbest[swapOperation[1]]
-            pbest[swapOperation[1]] = aux
-            
-            #pbest[swapOperation[0]], pbest[swapOperation[1]] = pbest[swapOperation[1]], pbest[swapOperation[0]] 
-
-
-        # generates all swap operators to calculate (gbest - x(t-1))
-        for i in range(self.graph.graphSize):
-          if newSolution[i] != gbest[i]:
-            # generates swap operator
-            swapOperation = (i, gbest.index(newSolution[i]), self.beta)
-            # append swap operator in the list of velocity
-            velocity.append(swapOperation)
-            # makes the swap         
-            aux = gbest[swapOperation[0]]
-            gbest[swapOperation[0]] = gbest[swapOperation[1]]
-            gbest[swapOperation[1]] = aux
-            
-            #gbest[swapOperation[0]], gbest[swapOperation[1]] = gbest[swapOperation[1]], gbest[swapOperation[0]] 
-        
+        currentSolution = particle.getCurrentSolution()[:] # gets copy of the current solution of the particle
         
         # updates velocity
+        r1 = random.random()
+        r2 = random.random()
+        velocity = [self.inertia*velocity[i] + self.p_confidence*r1*(pbest[i]-currentSolution[i]) + self.s_confidence*r2*(gbest[i]-currentSolution[i]) for i in range(len(velocity))]
         particle.setVelocity(velocity)
                 
-        
-        # Inverts the cities between the selected points        
-        for swapOperation in velocity:
-          if random.random() <= swapOperation[2]:
-            point1 = swapOperation[0]
-            point2 = swapOperation[1]
-            while True:
-              newSolution[point1],newSolution[point2] = newSolution[point2],newSolution[point1]
-              point1 = point1 + 1
-              point2 = point2 - 1
-              if point1 > point2:
-                break
-              
+        # new solution
+        newSolution = [currentSolution[i] + velocity[i] for i in range(len(currentSolution))]
         
         # gets cost of the current solution
-        newSolutionCost = self.graph.evaluateCost(newSolution)
-        
-        if newSolutionCost < previousCost:
-          # updates the current solution  
-          particle.setCurrentSolution(newSolution)
-          # updates the cost of the current solution
-          particle.setCostCurrentSolution(newSolutionCost)
-                
+        newSolutionCost = self.cost_function(*newSolution)
+        #if newSolutionCost < previousCost:
+        # updates the current solution  
+        particle.setCurrentSolution(newSolution)
+        # updates the cost of the current solution
+        particle.setCostCurrentSolution(newSolutionCost)               
 
         # checks if new solution is pbest solution
         pbCost =  particle.getCostPBest()
         if newSolutionCost < pbCost:
           particle.setPBest(newSolution)
           particle.setCostPBest(newSolutionCost)
-       
-        
+               
         gbestCost = self.gbest.getCostPBest()       
         # check if new solution is gbest solution
         if newSolutionCost < gbestCost:
-          self.gbest = particle
+          self.gbest = copy.deepcopy(particle)
 
         convergencePerIteration.append(t)
         convergencePerIteration.append(self.gbest.getCostPBest())
@@ -273,130 +199,9 @@ class PSO:
     plt.ylabel("Best cost")
     plt.plot(df['Iteration'], df['Best cost'])
 
-    """
-    csvFile = open('pso-convergence.csv', 'w', newline='')  
-    with csvFile: 
-         writer = csv.writer(csvFile)
-         writer.writerows(convergenceData)
-    csvFile.close()
-    
-    """ 
     print("Elapsed time: ", self.elapsedTime(startTime))
   
   
-
-  # Calculate the objective function
-  def evaluateCost(self, route):
-    routeSize = len(route)
-    
-    # Determine the cost of traversing the cities
-    first = -1
-    second = -1
-    last = -1
-    cost = 0.0
-    #print(routeSize)
-    #print(route)
-    i = 0
-    while routeSize > 1 and i < routeSize-1:
-      first = route[i]
-      second = route[i+1]
-      cost = cost + GRAPH[first][second]
-      i = i + 1
-    # Complete Hamiltonian circuit
-    last = route[routeSize-1]
-    first = route[0]
-    cost = cost + GRAPH[last][first]
-    return cost  
-
-
-
-  def generateSavingsMatrix(self):
-    savingsMatrix = []
-    for i in range(1, GRAPH_SIZE):
-      for j in range(1, GRAPH_SIZE):
-        savings = GRAPH[i][0] + GRAPH[0][j] - GRAPH[i][j]
-        # saving = CWSA_mtx[i,-1] + CWSA_mtx[j,-1] - CWSA_mtx[i,j]
-        savingsMatrix.append(Savings(i, j, savings))
-    savingsMatrix = sorted(savingsMatrix, reverse=True)
-    return savingsMatrix
-    # sorted(student_objects, key=lambda student: student.age)
-
-  def getNodeFromSavings(self, last, savings_matrix  = [], best = []):
-    for i in range(len(savings_matrix)):
-      node = savings_matrix[i]
-      fromNode = node.get_from_node()
-      toNode = node.get_to_node()
-      #print("Last: ", last)
-      #print("fromNode:", fromNode)
-      #print("toNode:", toNode)
-      if fromNode == last and toNode not in best:
-        return toNode
-
-# class that represents a graph
-class Graph:
-
-  def __init__(self, amount_vertices, cost_table):
-
-    self.costTable = cost_table
-    self.graphSize = amount_vertices
-
-
-
-  # Calculate the objective function
-  def evaluateCost(self, route):
-    routeSize = len(route)
-    
-    # Determine the cost of traversing the cities
-    first = -1
-    second = -1
-    last = -1
-    cost = 0.0
-    #print(routeSize)
-    #print(route)
-    i = 0
-    while routeSize > 1 and i < routeSize-1:
-      first = route[i]
-      second = route[i+1]
-      cost = cost + self.costTable[first][second]
-      i = i + 1
-    # Complete Hamiltonian circuit
-    last = route[routeSize-1]
-    first = route[0]
-    cost = cost + self.costTable[last][first]
-    return cost
-
-
-
-  # gets random unique paths - returns a list of lists of paths
-  def getRandomPaths(self, max_size):
-    random_paths = []
-    
-    for i in range(max_size):
-      
-      list_temp = self.getRandomSolution(self.graphSize)
-
-      if list_temp not in random_paths:
-        random_paths.append(list_temp)
-    return random_paths
-    
-  # Generate a random sequence and stores it
-  # as a Route
-  def getRandomSolution(self, graph_size):
-    route = Chromosome()
-    visited = [0 for j in range(graph_size)]
-    city = -1
-    cityCount = 0
-    while cityCount < len(visited):
-      city = random.randint(0, graph_size-1)
-      while visited[city] == 1:
-        city = random.randint(0, graph_size-1)
-      route.append(city)
-      visited[city] = 1
-      cityCount = cityCount + 1
-    return route
-
-
-
 
 # class that represents a particle
 class Particle:
@@ -413,9 +218,9 @@ class Particle:
     self.newSolutionCost = cost
     self.pbestCost = cost
 
-    # velocity of a particle is a sequence of 3-tuple
-    # (1, 2, 0.8) means SO(1,2), beta = 0.8
-    self.velocity = []
+    # velocity of a particle is a tuple of
+    # n cost function variables
+    self.velocity = [0 for _ in solution]
 
   # set pbest
   def setPBest(self, new_pbest):
@@ -461,81 +266,28 @@ class Particle:
   def clearVelocity(self):
     del self.velocity[:]
   
-  
+  # gets random unique paths - returns a list of lists of paths
+  def getRandomSolutions(size, search_space, max_size):
+    random_solutions = []
+    
+    for i in range(max_size):
+      
+      list_temp = Particle.getRandomSolution(size, search_space)
 
-# Define Route as a subclass of list
-class Route(list):
-  def __init__(self):
-    self.elements = []
-  #def size(self):
-  #  return len(self.elements)
+      if list_temp not in random_solutions:
+        random_solutions.append(list_temp)
 
-# An Individual stores its route along with
-# its cost and fitness.
-class Individual:
-  def __init__(self, route):
-    self.route = route
-    self.cost = 0.0
-    self.fitness = 0.0
-  
-  def getRoute(self):
-    return self.route
+    return random_solutions
 
-  def setRoute(self, route):
-    self.route = route
-    
-  def getFitness(self):
-    return self.fitness
+  # Generate a random sequence and stores it
+  # as a Route
+  def getRandomSolution(size, search_space):
+    solution = []
+    min, max = search_space
+    for _ in range(size):
+      solution.append(min + (random.random() * (max - min)))
+    return solution
 
-  def setFitness(self, fitness):
-    self.fitness = fitness
-    
-  def getCost(self):
-    return self.cost
-    
-  def setCost(self, cost):
-    self.cost = cost
-    
-# Test code begins
-
-class Savings(object):
-  def __init__(self, from_node, to_node, savings_value):
-    self.from_node = from_node
-    self.to_node = to_node
-    self.savings_value = savings_value
-  
-  def get_from_node(self):
-    return self.from_node
-
-  def get_to_node(self):
-    return self.to_node
-        
-  def __repr__(self):
-    return repr((self.from_node, self.to_node, self.savings_value))
-    
-  def __lt__(self, other):
-    return self.savings_value < other.savings_value
-  
-  def __eq__(self, other):
-    return self.savings_value == other.savings_value
-
-
-class City:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    
-    def set_x(self, x):
-        self.x = x
-    
-    def get_x(self):
-        return self.x
-    
-    def set_y(self, y):
-        self.y = y
-    
-    def get_y(self):
-        return self.y
 
 # Define Chromosome as a subclass of list
 class Chromosome(list):
@@ -543,126 +295,17 @@ class Chromosome(list):
     self.elements = []
 
 
-
-# Nest nearest integer
-def nint(number):
-  return int(number + (0.5 if number > 0 else -0.5))
-  
-# Calculate Euclidean distance for one location
-def calculate_distance(x1, y1, x2, y2):
-    return math.sqrt(math.pow((x1 - x2), 2) + math.pow((y1 - y2), 2))
-
-def generateDistanceMatrix(file_name):
-  # Open input file
-  
-  infile = open(file_name, 'r')
-
-  # Read instance header
-  name = infile.readline().strip().split()[1] # NAME
-  fileType = infile.readline().strip().split()[1] # TYPE
-  comment = infile.readline().strip().split()[1] # COMMENT
-  dimension = infile.readline().strip().split()[1] # DIMENSION
-  edgeWeightType = infile.readline().strip().split()[1] # EDGE_WEIGHT_TYPE
-  infile.readline()
-
-  # Read node list
-  nodelist = []
-  #N = int(dimension)
-  print("Dimension: ", dimension)
-  print("Edge weight type: ", edgeWeightType)
-  for i in range(0, int(dimension)):
-    x,y = infile.readline().strip().split()[1:]    
-    newCity = City(float(x), float(y))
-    nodelist.append(newCity)
-      #nodelist.append([float(x), float(y)])
-
-  # Close input file
-  infile.close()
-
-  GRAPH = []
-  newDist = []
-  print("Dimension: ", dimension)
-  N = int(dimension)
-  for i  in range(0, N):
-    x_i = nodelist[i].get_x()
-    y_i = nodelist[i].get_y()
-    newDist = []
-    for j in range(0, len(nodelist)):
-      x_j = nodelist[j].get_x()
-      y_j = nodelist[j].get_y()
-      
-      #  edge weight type GEO means geographic coordinates
-      if edgeWeightType == "GEO":
-        deg = int(x_i)
-        min = x_i - deg
-        latitudeI = math.pi * (deg + 5.0 * min / 3.0) / 180.0
-        
-        deg = int(y_i)
-        min = y_i - deg
-        longitudeI = math.pi * (deg + 5.0 * min / 3.0) / 180.0
-        
-        deg = int(x_j)
-        min = x_j - deg
-        latitudeJ = math.pi * (deg + 5.0 * min / 3.0) / 180.0
-        
-        deg = int(y_j)
-        min = y_j - deg
-        longitudeJ = math.pi * (deg + 5.0 * min / 3.0) / 180.0
-        
-        R = 6378.388 # Earth radius
-        q1 = math.cos( longitudeI - longitudeJ )
-        q2 = math.cos( latitudeI - latitudeJ )
-        q3 = math.cos( latitudeI + latitudeJ )
-        dist = int((R * math.acos(0.5*((1.0+q1)*q2-(1.0-q1)*q3))+1.0))
-        
-        if i == j:
-          dist = 0
-      else:
-        dist = nint(calculate_distance(x_i, y_i, x_j, y_j))
-      if dist == 0:
-        dist = 10000000
-      #newDist = []
-      #print("Distance 1: ", dist)
-      newDist.append(dist)
-    GRAPH.append(newDist)
-    #print(GRAPH)
-  return GRAPH
-
 if __name__ == "__main__":
-  # Read a TSP file and convert x,y coordinates to distance matrix
-  # Uncomment the line that corresponds to the TSP file that you want to use
-  #GRAPH = generateDistanceMatrix('clientes2.tsp')
-  #GRAPH = generateDistanceMatrix('ulysses16.tsp')
-  #GRAPH = generateDistanceMatrix('ulysses22.tsp')
-  #GRAPH = generateDistanceMatrix('berlin52.tsp')
-  GRAPH = generateDistanceMatrix('eil101.tsp')
-  #GRAPH = generateDistanceMatrix('a280.tsp')
-  #GRAPH = generateDistanceMatrix('capp1.tsp')
-  #GRAPH = generateDistanceMatrix('capp2.tsp')
-  #GRAPH = generateDistanceMatrix('fl417.tsp')
-  #GRAPH_SIZE = len(GRAPH)
-  
-  GRAPH_SIZE = len(GRAPH)
-  
-  
-  # creates the Graph instance
-  graph = Graph(GRAPH_SIZE, GRAPH)
-
-
   # creates a PSO instance
   # alfa is the probabiliy for a movement based on local best
   # beta is the probability for a movement based on the global best
-  
- 
-  
   results = ["Solution", "Cost", "Comp. time", "Max iter"]
   fileoutput = []
   fileoutput.append(results)
-  for i  in range(50):
+  function = 'beale'
+  for i  in range(2):
     results = []
-    #pso = Solver(graph, iterations=1000, maxEpochs=80, size_population=15, beta=0.80, alfa=0.2)
-    #pso = Solver(graph, iterations=1000, maxEpochs=50, size_population=15, beta=0.51, alfa=0.11)
-    pso = PSO(graph, iterations=10000, size_population=150, alfa=0.257, beta=0.05)
+    pso = PSO(globals()[function], functions_search_space[function], iterations=10000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
     results.append(pso.getGBest().getPBest())
@@ -673,17 +316,13 @@ if __name__ == "__main__":
     results.append(ms)
     results.append(iteration)
     fileoutput.append(results)
+    # shows the global best particle
+    print("Cost of gbest: ", pso.getGBest().getCostPBest()) 
+    print("gbest: ", pso.getGBest().getPBest())
+    print("")
 
-  csvFile = open('pso-simple-eil101-dic-14-1453.csv', 'w', newline='')  
+  csvFile = open('pso-simple-continuous-functions.csv', 'w', newline='')  
   with csvFile: 
     writer = csv.writer(csvFile)
     writer.writerows(fileoutput)
   csvFile.close()
-
-
-  # shows the global best particle
-  print("")
-  print("alfa: ", pso.alfa, "beta: ", pso.beta)
-  print("Cost of gbest: ", pso.getGBest().getCostPBest()) 
-  print("gbest: ", pso.getGBest().getPBest())
-
