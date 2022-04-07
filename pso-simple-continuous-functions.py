@@ -305,7 +305,7 @@ if __name__ == "__main__":
   function = 'beale'
   for i  in range(30):
     results = []
-    pso = PSO(globals()[function], functions_search_space[function], iterations=10000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
+    pso = PSO(globals()[function], functions_search_space[function], iterations=50000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
     results.append(pso.getGBest().getPBest())
