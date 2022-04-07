@@ -370,8 +370,8 @@ class Solver:
         break
     
     print("What's going on?")
-    print("Cost of gbest: ", self.gbest.getGBest().getCostPBest()) 
-    print("gbest: ", self.gbest.getGBest().getPBest())
+    print("Cost of gbest: ", self.gbest.getCostPBest()) 
+    print("gbest: ", self.gbest.getPBest())
     print("")
     df = pd.DataFrame()
     if self.max_epochs == 1:
@@ -419,7 +419,7 @@ if __name__ == "__main__":
   function = 'biggs_exp4'
   for i  in range(2):
     results = []
-    pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=200, population_size=10, beta=0.29, alfa=0.12)
+    pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
     results.append(pso.getGBest().getPBest())
