@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
+from math import isclose
 
     
 # class that represents a particle
@@ -365,10 +366,13 @@ class Solver:
       else:
         std = 1000
       
-      if std == 0:
+      if isclose(std,0):
         break
     
     print("What's going on?")
+    print("Cost of gbest: ", self.gbest.getGBest().getCostPBest()) 
+    print("gbest: ", self.gbest.getGBest().getPBest())
+    print("")
     df = pd.DataFrame()
     if self.max_epochs == 1:
       df['Iteration'] = pd.Series(iterationArray)
