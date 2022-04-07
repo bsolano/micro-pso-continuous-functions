@@ -173,7 +173,7 @@ class PSO:
       
 
         if batchCounter > batchSize:
-          print(t, "Gbest cost = ", self.gbest.getCostPBest())
+          print(t, "Gbest cost = ", "{:.20f}".format(self.gbest.getCostPBest()))
           #print("Standard deviation: ", std)
           batchCounter = 0
           bestCostSampling.append(self.gbest.getCostPBest())
@@ -303,7 +303,7 @@ if __name__ == "__main__":
   fileoutput = []
   fileoutput.append(results)
   function = 'beale'
-  for i  in range(2):
+  for i  in range(30):
     results = []
     pso = PSO(globals()[function], functions_search_space[function], iterations=10000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
     start_time = datetime.now()
@@ -317,7 +317,7 @@ if __name__ == "__main__":
     results.append(iteration)
     fileoutput.append(results)
     # shows the global best particle
-    print("Cost of gbest: ", pso.getGBest().getCostPBest()) 
+    print("Cost of gbest: ", "{:.20f}".format(pso.getGBest().getCostPBest())) 
     print("gbest: ", pso.getGBest().getPBest())
     print("")
 
