@@ -19,8 +19,18 @@ functions_search_space = {
     'biggs_exp5': (0.0,20.0),
     'biggs_exp6': (0.0,20.0),
     'cross_in_tray': (-10.0,10.0),
-    'drop_in_wave': (-5.12,5.12),
-    'weibull': (0.0,250.0)
+    'drop_in_wave': (-5.12,5.12)
+}
+
+functions_solution = {
+    'beale': [3,0.5],
+    'biggs_exp2': [1,10],
+    'biggs_exp3': [1,10,5],
+    'biggs_exp4': [1,10,1,5],
+    'biggs_exp5': [1,10,1,5,4],
+    'biggs_exp6': [1,10,1,5,4,3],
+    'cross_in_tray': [1.349406685353340,1.349406608602084],
+    'drop_in_wave': [0,0]
 }
 
 def beale(x1, x2, x3):
@@ -74,11 +84,3 @@ def cross_in_tray(x1, x2):
 
 def drop_in_wave(x1, x2):
     return -( 1 + cos( 12*sqrt(x1*x1+x2*x2) )) / ( 0.5*(x1*x1+x2*x2) + 2 )
-
-def weibull(x1, x2, x3):
-    sum = 0
-    for i in range(1,100):
-        zi = 0.1*i
-        yi = 25 + (50 * log(1/zi))**(2/3)
-        sum += (exp(-((yi - x3)**x2/x1)) - zi)**2 
-    return sum
