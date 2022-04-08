@@ -9,7 +9,6 @@ from math import sqrt
 from math import exp
 from math import pi
 from math import fabs
-from math import log
 
 functions_search_space = {
     'beale': (-4.5, 4.5),
