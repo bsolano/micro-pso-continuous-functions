@@ -273,7 +273,7 @@ class Solver:
         print("Particles: ", len(self.particles))
         # Insert the best individual into the new population (1% of the population)
         if random.uniform(0,1.0) < 1.0:
-          mutated_elite = self.mutateGoodSolution(self.gbest.getPBest())
+          mutated_elite = self.mutateGoodSolution(self.gbest.getPBest(), *self.search_space)
           self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
     
@@ -295,7 +295,7 @@ class Solver:
           if len(particle.history) == HISTORY_SIZE:
             particle.history.pop(0)
           
-          bestNeighbor = self.mutateGoodSolution(particle.getCurrentSolution())
+          bestNeighbor = self.mutateGoodSolution(particle.getCurrentSolution(), *self.search_space)
           bestNeighborCost = self.cost_function(*bestNeighbor)
           
           newSolution = particle.getCurrentSolution()[:]
@@ -368,7 +368,7 @@ class Solver:
       else:
         std = 1000
       
-      if isclose(std,0):
+      if isclose(std, 0, abs_tol = 1e-05):
         break
     
     print("What's going on?")
@@ -393,8 +393,15 @@ class Solver:
 
 
   # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
-  def mutateGoodSolution(self, elite_solution, mu=0.01, sigma=0.1):
+  def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.01, sigma=0.1):
     chromosome = [elite_solution[i]+sigma*random.random() if random.random() <= mu else elite_solution[i] for i in range(len(elite_solution))]
+    return chromosome
+
+  # mutates a randomly selected gene
+  def mutateGoodSolution(self, elite_solution, min, max):
+    point = random.randint(0, len(elite_solution)-1)
+    chromosome = elite_solution[:]
+    chromosome[point] = min + (random.random() * (max - min))
     return chromosome
 
   # Crossover operator
