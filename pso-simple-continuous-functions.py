@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from benchmark_functions import *
 from inspect import signature
+from decimal import Decimal
 
 
 # PSO algorithm
