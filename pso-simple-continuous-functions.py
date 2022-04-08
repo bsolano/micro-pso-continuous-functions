@@ -299,7 +299,7 @@ if __name__ == "__main__":
   # creates a PSO instance
   # alfa is the probabiliy for a movement based on local best
   # beta is the probability for a movement based on the global best
-  results = ["Solution", "Cost", "Comp. time", "Max iter"]
+  results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
   fileoutput = []
   fileoutput.append(results)
   function = 'biggs_exp4'
@@ -308,6 +308,8 @@ if __name__ == "__main__":
     pso = PSO(globals()[function], functions_search_space[function], iterations=50000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
+    results.append(function)
+    results.append(functions_solution[function])
     results.append(pso.getGBest().getPBest())
     results.append(pso.getGBest().getCostPBest())
     iteration = pso.getIter()

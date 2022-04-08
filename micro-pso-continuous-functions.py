@@ -436,7 +436,7 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time"]
+  results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
   fileoutput = []
   fileoutput.append(results)
   function = 'biggs_exp4'
