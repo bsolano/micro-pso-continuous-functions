@@ -119,7 +119,7 @@ class Particle:
 # PSO algorithm
 class Solver:
 
-  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost'):
+  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover'):
     self.cost_function = cost_function # the cost function
     self.nvars = len(signature(cost_function).parameters) # number of variables in the cost function
     self.search_space = search_space # interval of the cost function
@@ -130,6 +130,7 @@ class Solver:
     self.beta = beta # the probability that all swap operators in swap sequence (gbest - x(t-1))
     self.alfa = alfa # the probability that all swap operators in swap sequence (pbest - x(t-1))
     self.last_epoch = 0
+    self.crossover_type = crossover_type
 
     # initialized with a group of random particles (solutions)
     solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
@@ -300,7 +301,7 @@ class Solver:
           newSolution = particle.getCurrentSolution()[:]
 
           if random.random() <= self.beta:
-            newSolution = self.crossover(list(newSolution), self.gbest.getPBest())
+            newSolution = getattr(self, self.crossover_type)(list(newSolution), self.gbest.getPBest())
           elif random.random() <= self.alfa:
             largest_dist = 0
             for neighbor_particle in self.particles:
@@ -310,7 +311,7 @@ class Solver:
               if dist > largest_dist:
                 largest_dist = dist
                 dissimilar_particle = neighbor_particle
-            newSolution = self.crossover(list(newSolution), dissimilar_particle.getPBest())
+            newSolution = getattr(self, self.crossover_type)(list(newSolution), dissimilar_particle.getPBest())
 
             # gets cost of the current solution
           newSolutionCost = self.cost_function(*newSolution)
@@ -402,6 +403,19 @@ class Solver:
     sonChromosome = [alpha[i]*dadChromosome[i] + (1-alpha[i])*momChromosome[i] for i in range(len(dadChromosome))]
     daugtherChromosome = [alpha[i]*momChromosome[i] + (1-alpha[i])*dadChromosome[i] for i in range(len(dadChromosome))]
     return sonChromosome
+
+
+  def average_crossover(self, dadChromosome, momChromosome):
+    """Average crossover mentioned in:
+    Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74"""
+    sonChromosome = list()
+    point1 = random.randint(0, len(dadChromosome)-1)
+    for i in range(0, point1+1):
+      sonChromosome.append(dadChromosome[i])
+    for i in range(point1+1, len(dadChromosome)):
+      sonChromosome.append((momChromosome[i]+dadChromosome[i])/2)
+    return sonChromosome
+
 
 
 # Define Chromosome as a subclass of list
