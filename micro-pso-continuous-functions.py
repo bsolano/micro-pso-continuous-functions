@@ -24,7 +24,6 @@ from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
 from math import isclose
-from decimal import Decimal
 
     
 # class that represents a particle
@@ -226,13 +225,13 @@ class Solver:
 
 
   def evaluateSolutionsAverageCost(self, solutions):
-    totalCost = Decimal(0.0)
+    totalCost = 0.0
     i = 0
     for solution in solutions:
       cost = self.cost_function(*solution)
       totalCost += cost
       i+=1
-    averageCost = float(totalCost) / float(i)
+    averageCost = totalCost / float(i)
     return averageCost
 
   # set gbest (best particle of the population)

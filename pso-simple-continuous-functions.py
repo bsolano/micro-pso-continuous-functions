@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from benchmark_functions import *
 from inspect import signature
-from decimal import Decimal
 
 
 # PSO algorithm
@@ -72,13 +71,13 @@ class PSO:
 
   def evaluateSolutionsAverageCost(self, solutions):
   
-    totalCost = Decimal(0.0)
+    totalCost = 0.0
     i = 0
     for solution in solutions:
       cost = self.cost_function(*solution)
       totalCost += cost
       i+=1
-    averageCost = float(totalCost) / float(i)
+    averageCost = totalCost / float(i)
 
     return averageCost
 
