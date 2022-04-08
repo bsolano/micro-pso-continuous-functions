@@ -428,7 +428,7 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  results = ["Solution", "Cost", "Comp. time"]
+  results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time"]
   fileoutput = []
   fileoutput.append(results)
   function = 'biggs_exp4'
@@ -437,6 +437,8 @@ if __name__ == "__main__":
     pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
+    results.append(function)
+    results.append(functions_solution[function])
     results.append(pso.getGBest().getPBest())
     results.append(pso.getGBest().getCostPBest())
     epoch = pso.getEpoch()
