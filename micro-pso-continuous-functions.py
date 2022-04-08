@@ -119,7 +119,7 @@ class Particle:
 # PSO algorithm
 class Solver:
 
-  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover'):
+  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutateGoodSolution'):
     self.cost_function = cost_function # the cost function
     self.nvars = len(signature(cost_function).parameters) # number of variables in the cost function
     self.search_space = search_space # interval of the cost function
@@ -131,6 +131,7 @@ class Solver:
     self.alfa = alfa # the probability that all swap operators in swap sequence (pbest - x(t-1))
     self.last_epoch = 0
     self.crossover_type = crossover_type
+    self.mutation_type = mutation_type
 
     # initialized with a group of random particles (solutions)
     solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
@@ -273,7 +274,7 @@ class Solver:
         print("Particles: ", len(self.particles))
         # Insert the best individual into the new population (1% of the population)
         if random.uniform(0,1.0) < 1.0:
-          mutated_elite = self.mutateGoodSolution(self.gbest.getPBest(), *self.search_space)
+          mutated_elite = getattr(self, self.mutation_type)(self.gbest.getPBest(), *self.search_space)
           self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
     
@@ -295,7 +296,7 @@ class Solver:
           if len(particle.history) == HISTORY_SIZE:
             particle.history.pop(0)
           
-          bestNeighbor = self.mutateGoodSolution(particle.getCurrentSolution(), *self.search_space)
+          bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
           bestNeighborCost = self.cost_function(*bestNeighbor)
           
           newSolution = particle.getCurrentSolution()[:]
