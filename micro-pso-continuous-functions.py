@@ -368,7 +368,7 @@ class Solver:
       else:
         std = 1000
       
-      if isclose(std, 0, abs_tol = 1e-05):
+      if isclose(std, 0):
         break
     
     print("What's going on?")
@@ -441,7 +441,7 @@ if __name__ == "__main__":
   function = 'biggs_exp4'
   for i  in range(2):
     results = []
-    pso = Solver(globals()[function], functions_search_space[function], iterations=1000, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
+    pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
     start_time = datetime.now()
     pso.run() # runs the PSO algorithm
     results.append(function)
