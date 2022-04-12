@@ -212,7 +212,6 @@ class Solver:
       # add the particle
       self.particles.append(particle)
 
-
   def evaluateSolutionsDiversity(self, solutions):
     simSum = 0
     count = 0
@@ -224,7 +223,6 @@ class Solver:
           sim = euclidean(solution1, solution2)
           simSum += sim
     return simSum / count
-
 
   def evaluateSolutionsAverageCost(self, solutions):
     totalCost = 0.0
@@ -249,6 +247,10 @@ class Solver:
   
   def getEpoch(self):
     return self.last_epoch
+
+  # gets solution
+  def getCurrentSolutions(self):
+    return [particle.getCurrentSolution() for particle in self.particles]
 
   def run(self):
     # variables for convergence data
@@ -287,6 +289,10 @@ class Solver:
         averageCost = statistics.mean(particle.pbestCost for particle in self.particles)
         costStd = statistics.pstdev(particle.pbestCost for particle in self.particles)
 
+        variables = zip(*self.getCurrentSolutions())
+        max_values = list(map(max, variables))
+        variables = zip(*self.getCurrentSolutions())
+        min_values = list(map(min, variables))
         # for each particle in the swarm
         for particle in self.particles:
           previousCost = particle.getCurrentSolutionCost()
@@ -298,7 +304,8 @@ class Solver:
             particle.history.pop(0)
           
           if self.mutation_type == 'mutateGoodSolution':
-            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min(min_values), max(max_values))
           elif self.mutation_type == 'mutateGoodSolutionMuSigma':
             bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           bestNeighborCost = self.cost_function(*bestNeighbor)
@@ -442,7 +449,7 @@ if __name__ == "__main__":
   fileoutput = []
   fileoutput.append(results)
   function = 'biggs_exp4'
-  for i  in range(2):
+  for i in range(5):
     results = []
     pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
     start_time = datetime.now()
