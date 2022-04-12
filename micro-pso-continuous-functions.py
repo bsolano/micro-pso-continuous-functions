@@ -118,7 +118,7 @@ class Particle:
 # PSO algorithm
 class Solver:
 
-  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutateGoodSolution'):
+  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutateGoodSolution', mu=0.01, sigma=0.1):
     self.cost_function = cost_function # the cost function
     self.nvars = len(signature(cost_function).parameters) # number of variables in the cost function
     self.search_space = search_space # interval of the cost function
@@ -131,6 +131,8 @@ class Solver:
     self.last_epoch = 0
     self.crossover_type = crossover_type
     self.mutation_type = mutation_type
+    self.mu = mu
+    self.sigma = sigma
 
     # initialized with a group of random particles (solutions)
     solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
@@ -295,7 +297,10 @@ class Solver:
           if len(particle.history) == HISTORY_SIZE:
             particle.history.pop(0)
           
-          bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+          if self.mutation_type == 'mutateGoodSolution':
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+          elif self.mutation_type == 'mutateGoodSolutionMuSigma':
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           bestNeighborCost = self.cost_function(*bestNeighbor)
           
           newSolution = particle.getCurrentSolution()[:]
@@ -391,9 +396,8 @@ class Solver:
       plt.plot(df['Epoch'], df['Best cost'])
       #plt.show()
 
-
   # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
-  def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.01, sigma=0.1):
+  def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.1, sigma=0.1):
     chromosome = [elite_solution[i]+sigma*random.random() if random.random() <= mu else elite_solution[i] for i in range(len(elite_solution))]
     return chromosome
 
@@ -410,7 +414,6 @@ class Solver:
     sonChromosome = [alpha[i]*dadChromosome[i] + (1-alpha[i])*momChromosome[i] for i in range(len(dadChromosome))]
     daugtherChromosome = [alpha[i]*momChromosome[i] + (1-alpha[i])*dadChromosome[i] for i in range(len(dadChromosome))]
     return sonChromosome
-
 
   def average_crossover(self, dadChromosome, momChromosome):
     """Average crossover mentioned in:
