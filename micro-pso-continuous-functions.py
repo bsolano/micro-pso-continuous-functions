@@ -17,6 +17,7 @@ import copy
 import csv
 import statistics
 from datetime import datetime
+from tokenize import ContStr
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -445,28 +446,69 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
-  fileoutput = []
-  fileoutput.append(results)
+  run_experiment = True
   function = 'biggs_exp4'
-  for i in range(5):
-    results = []
-    pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
-    start_time = datetime.now()
-    pso.run() # runs the PSO algorithm
-    results.append(function)
-    results.append(functions_solution[function])
-    results.append(pso.getGBest().getPBest())
-    results.append(pso.getGBest().getCostPBest())
-    epoch = pso.getEpoch()
-    dt = datetime.now() - start_time
-    ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-    results.append(ms)
-    results.append(epoch)
+  if run_experiment == True:
+    fileoutput = []
+    results = ['Beta', 'Alfa'] + ['run'+str(i+1) for i in range(20)] + ['Mean']
     fileoutput.append(results)
-  
-  # pso-results.csv  
-  csvFile = open('micro-pso-continuous.csv', 'w', newline='')  
+    beta_alfa_values = [[0.64173937, 0.3609376],
+                        [0.51559771, 0.95298392],
+                        [0.3560774,  0.26500581],
+                        [0.96260928, 0.82126358],
+                        [0.68207588, 0.12677738],
+                        [0.27819921, 0.09201003],
+                        [0.12358181, 0.76814224],
+                        [0.34373103, 0.92170513],
+                        [0.04371207, 0.0384513 ],
+                        [0.91322373, 0.42522076],
+                        [0.73455707, 0.17863831],
+                        [0.08077035, 0.85692541],
+                        [0.46210794, 0.56074551],
+                        [0.40062785, 0.52164894],
+                        [0.89165849, 0.61570168],
+                        [0.57651109, 0.24399474],
+                        [0.1828317,  0.32957296],
+                        [0.82806744, 0.73347326],
+                        [0.24536891, 0.6895526 ],
+                        [0.79578451, 0.48056147]]
+    for beta_alfa in beta_alfa_values:
+      mean_cost = 0
+      results = beta_alfa
+      for i in range(20):
+        pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=beta_alfa[0], alfa=beta_alfa[1])
+        pso.run() # runs the PSO algorithm
+        cost = pso.getGBest().getCostPBest()
+        results.append(cost)
+        mean_cost += cost
+      mean_cost /= 20.0
+      results.append(mean_cost)
+      fileoutput.append(results)
+  else:
+    results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
+    fileoutput = []
+    fileoutput.append(results)
+    for i in range(5):
+      results = []
+      pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
+      start_time = datetime.now()
+      pso.run() # runs the PSO algorithm
+      results.append(function)
+      results.append(functions_solution[function])
+      results.append(pso.getGBest().getPBest())
+      results.append(pso.getGBest().getCostPBest())
+      epoch = pso.getEpoch()
+      dt = datetime.now() - start_time
+      ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+      results.append(ms)
+      results.append(epoch)
+      fileoutput.append(results)
+
+  # pso-results.csv
+  if run_experiment == True:
+    csvFile = open('micro-pso-continuous-experiment.csv', 'w', newline='')
+  else:
+    csvFile = open('micro-pso-continuous.csv', 'w', newline='')
   with csvFile: 
     writer = csv.writer(csvFile)
     writer.writerows(fileoutput)
