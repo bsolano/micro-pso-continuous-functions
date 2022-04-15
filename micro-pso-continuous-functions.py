@@ -119,7 +119,7 @@ class Particle:
 # PSO algorithm
 class Solver:
 
-  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutateGoodSolution', mu=0.1, sigma=0.1):
+  def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutateGoodSolution', mu=0.1, sigma=0.1, gamma=0.1):
     self.cost_function = cost_function # the cost function
     self.nvars = len(signature(cost_function).parameters) # number of variables in the cost function
     self.search_space = search_space # interval of the cost function
@@ -134,6 +134,7 @@ class Solver:
     self.mutation_type = mutation_type
     self.mu = mu
     self.sigma = sigma
+    self.gamma = gamma
 
     # initialized with a group of random particles (solutions)
     solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
@@ -314,7 +315,10 @@ class Solver:
           newSolution = particle.getCurrentSolution()[:]
 
           if random.random() <= self.beta:
-            newSolution = getattr(self, self.crossover_type)(list(newSolution), self.gbest.getPBest())
+            if self.crossover_type=='average_crossover':
+              newSolution = getattr(self, self.crossover_type)(list(newSolution), self.gbest.getPBest())
+            elif self.crossover_type=='crossover':
+              newSolution = getattr(self, self.crossover_type)(list(newSolution), self.gbest.getPBest(), gamma=self.gamma)
           elif random.random() <= self.alfa:
             largest_dist = 0
             for neighbor_particle in self.particles:
@@ -324,7 +328,10 @@ class Solver:
               if dist > largest_dist:
                 largest_dist = dist
                 dissimilar_particle = neighbor_particle
-            newSolution = getattr(self, self.crossover_type)(list(newSolution), dissimilar_particle.getPBest())
+            if self.crossover_type=='average_crossover':
+              newSolution = getattr(self, self.crossover_type)(list(newSolution), dissimilar_particle.getPBest())
+            elif self.crossover_type=='crossover':
+              newSolution = getattr(self, self.crossover_type)(list(newSolution), dissimilar_particle.getPBest(), gamma=self.gamma)
 
             # gets cost of the current solution
           newSolutionCost = self.cost_function(*newSolution)
