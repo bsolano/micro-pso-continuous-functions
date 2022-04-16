@@ -1,3 +1,6 @@
+from numba import jit
+from numpy import inf
+
 from math import sin
 from math import cos
 from math import sqrt
@@ -27,9 +30,11 @@ functions_solution = {
     'drop_in_wave': [0,0]
 }
 
+@jit(nopython=True)
 def beale(x1, x2, x3):
     return (1.5 - x1 + x1*x2)**2 + (2.25 - x1 + x1*x2**2)**2 + (2.625 - x1 + x1*x3**3)**2
 
+@jit(nopython=True, parallel=True)
 def biggs_exp2(x1, x2):
     sum = 0
     for i in range(1,11):
@@ -37,10 +42,11 @@ def biggs_exp2(x1, x2):
         yi = exp(-zi) - 5*exp(-10*zi)
         try:
             sum += ( (exp(-x1*zi) - 5*exp(-x2*zi)) - yi )**2
-        except OverflowError:
-            sum = float('inf')
+        except Exception:
+            sum = inf
     return sum
 
+@jit(nopython=True, parallel=True)
 def biggs_exp3(x1, x2, x3):
     sum = 0
     for i in range(1,11):
@@ -48,10 +54,11 @@ def biggs_exp3(x1, x2, x3):
         yi = exp(-zi) - 5*exp(-10*zi)
         try:
             sum += ( (exp(-x1*zi) - x3*exp(-x2*zi)) - yi )**2
-        except OverflowError:
-            sum = float('inf')
+        except Exception:
+            sum = inf
     return sum
 
+@jit(nopython=True, parallel=True)
 def biggs_exp4(x1, x2, x3, x4):
     sum = 0
     for i in range(1,11):
@@ -59,10 +66,11 @@ def biggs_exp4(x1, x2, x3, x4):
         yi = exp(-zi) - 5*exp(-10*zi)
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi)) - yi )**2
-        except OverflowError:
-            sum = float('inf')
+        except Exception:
+            sum = inf
     return sum
 
+@jit(nopython=True, parallel=True)
 def biggs_exp5(x1, x2, x3, x4, x5):
     sum = 0
     for i in range(1,11):
@@ -70,10 +78,11 @@ def biggs_exp5(x1, x2, x3, x4, x5):
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi) + 3*exp(-x5*zi)) - yi )**2
-        except OverflowError:
-            sum = float('inf')
+        except Exception:
+            sum = inf
     return sum
 
+@jit(nopython=True, parallel=True)
 def biggs_exp6(x1, x2, x3, x4, x5, x6):
     sum = 0
     for i in range(1,11):
@@ -81,12 +90,14 @@ def biggs_exp6(x1, x2, x3, x4, x5, x6):
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi) + x6*exp(-x5*zi)) - yi )**2
-        except OverflowError:
-            sum = float('inf')
+        except Exception:
+            sum = inf
     return sum
 
+@jit(nopython=True)
 def cross_in_tray(x1, x2):
     return -0.0001 * ( fabs( sin(x1)*sin(x2) * exp( fabs(100-sqrt(x1*x1+x2*x2)/pi) ) ) + 1 )**0.1
 
+@jit(nopython=True)
 def drop_in_wave(x1, x2):
     return -( 1 + cos( 12*sqrt(x1*x1+x2*x2) )) / ( 0.5*(x1*x1+x2*x2) + 2 )
