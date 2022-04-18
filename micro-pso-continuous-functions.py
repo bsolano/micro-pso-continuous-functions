@@ -267,7 +267,7 @@ class Solver:
 
     HISTORY_SIZE = 100
     
-    record_values = [['Epoch'] + ['x'+str(i+1)+'='+str(int(self.search_space[i])) for i in range(self.nvars)] + ['max x'+str(i+1) for i in range(self.nvars)] + ['min x'+str(i+1) for i in range(self.nvars)]]
+    record_values = [['Epoch'] + ['x'+str(i+1)+'='+str(int(functions_solution[self.cost_function][i])) for i in range(self.nvars)] + ['max x'+str(i+1) for i in range(self.nvars)] + ['min x'+str(i+1) for i in range(self.nvars)]]
     epoch = 0
     while epoch < self.max_epochs:
       print("Epoch: ", epoch, "with ", self.population_size, " particles")
