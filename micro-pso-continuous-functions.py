@@ -267,6 +267,7 @@ class Solver:
 
     HISTORY_SIZE = 100
     
+    record_values = [['Epoch'] + ['x'+str(i+1)+'='+str(int(self.search_space[i])) for i in range(self.nvars)] + ['max x'+str(i+1) for i in range(self.nvars)] + ['min x'+str(i+1) for i in range(self.nvars)]]
     epoch = 0
     while epoch < self.max_epochs:
       print("Epoch: ", epoch, "with ", self.population_size, " particles")
@@ -282,7 +283,7 @@ class Solver:
           mutated_elite = getattr(self, self.mutation_type)(self.gbest.getPBest(), *self.search_space)
           self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
-    
+
       # for each time step (iteration)
       for t in range(self.iterations):
         convergencePerIteration = []
@@ -307,8 +308,8 @@ class Solver:
             particle.history.pop(0)
           
           if self.mutation_type == 'mutateGoodSolution':
-            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
-            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min(min_values), max(max_values))
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min(min_values), max(max_values))
           elif self.mutation_type == 'mutateGoodSolutionMuSigma':
             bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           bestNeighborCost = self.cost_function(*bestNeighbor)
@@ -380,6 +381,11 @@ class Solver:
           epochArray.append(epoch)
           epochBestCostArray.append(self.gbest.getCostPBest())
     
+      variables = zip(*self.getCurrentSolutions())
+      max_values = list(map(max, variables))
+      variables = zip(*self.getCurrentSolutions())
+      min_values = list(map(min, variables))
+      record_values.append([epoch] + self.gbest.getPBest() + max_values + min_values)
       epoch = epoch + 1
       self.setEpoch(epoch)
       bestCostSampling.append(self.gbest.getCostPBest())
@@ -392,6 +398,12 @@ class Solver:
       if isclose(std, 0):
         break
     
+    valuesFile = open('values-'+str(datetime.timestamp(datetime.now()))+'.csv', 'w', newline='')
+    with valuesFile:
+      writer = csv.writer(valuesFile)
+      writer.writerows(record_values)
+    valuesFile.close()
+
     print("What's going on?")
     print("Cost of gbest: ", self.gbest.getCostPBest()) 
     print("gbest: ", self.gbest.getPBest())
@@ -454,7 +466,7 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  run_experiment = True
+  run_experiment = False
   function = 'biggs_exp4'
   if run_experiment == True:
     fileoutput = []
@@ -568,9 +580,9 @@ if __name__ == "__main__":
     results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
     fileoutput = []
     fileoutput.append(results)
-    for i in range(5):
+    for i in range(15):
       results = []
-      pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
+      pso = Solver(globals()[function], functions_search_space[function], iterations=200, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
       start_time = datetime.now()
       pso.run() # runs the PSO algorithm
       results.append(function)
