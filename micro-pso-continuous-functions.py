@@ -291,10 +291,11 @@ class Solver:
         averageCost = statistics.mean(particle.pbestCost for particle in self.particles)
         costStd = statistics.pstdev(particle.pbestCost for particle in self.particles)
 
-        variables = zip(*self.getCurrentSolutions())
-        max_values = list(map(max, variables))
-        variables = zip(*self.getCurrentSolutions())
-        min_values = list(map(min, variables))
+        if self.mutation_type == 'mutateGoodSolution':
+          variables = zip(*self.getCurrentSolutions())
+          max_values = list(map(max, variables))
+          variables = zip(*self.getCurrentSolutions())
+          min_values = list(map(min, variables))
         # for each particle in the swarm
         for particle in self.particles:
           previousCost = particle.getCurrentSolutionCost()
