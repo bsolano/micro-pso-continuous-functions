@@ -43,7 +43,7 @@ def biggs_exp2(x1, x2):
         try:
             sum += ( (exp(-x1*zi) - 5*exp(-x2*zi)) - yi )**2
         except Exception:
-            sum = inf
+            return inf
     return sum
 
 @jit(nopython=True, parallel=True)
@@ -55,7 +55,7 @@ def biggs_exp3(x1, x2, x3):
         try:
             sum += ( (exp(-x1*zi) - x3*exp(-x2*zi)) - yi )**2
         except Exception:
-            sum = inf
+            return inf
     return sum
 
 @jit(nopython=True, parallel=True)
@@ -67,7 +67,7 @@ def biggs_exp4(x1, x2, x3, x4):
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi)) - yi )**2
         except Exception:
-            sum = inf
+            return inf
     return sum
 
 @jit(nopython=True, parallel=True)
@@ -79,7 +79,7 @@ def biggs_exp5(x1, x2, x3, x4, x5):
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi) + 3*exp(-x5*zi)) - yi )**2
         except Exception:
-            sum = inf
+            return inf
     return sum
 
 @jit(nopython=True, parallel=True)
@@ -91,7 +91,7 @@ def biggs_exp6(x1, x2, x3, x4, x5, x6):
         try:
             sum += ( (x3*exp(-x1*zi) - x4*exp(-x2*zi) + x6*exp(-x5*zi)) - yi )**2
         except Exception:
-            sum = inf
+            return inf
     return sum
 
 @jit(nopython=True)
