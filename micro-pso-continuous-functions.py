@@ -93,12 +93,12 @@ class Particle:
     del self.velocity[:]
 
   # gets random unique paths - returns a list of lists of paths
-  def getRandomSolutions(size, search_space, max_size):
+  def getRandomSolutions(size, min, max, max_size):
     random_solutions = []
     
-    for i in range(max_size):
+    for _ in range(max_size):
       
-      list_temp = Particle.getRandomSolution(size, search_space)
+      list_temp = Particle.getRandomSolution(size, min, max)
 
       if list_temp not in random_solutions:
         random_solutions.append(list_temp)
@@ -107,11 +107,10 @@ class Particle:
 
   # Generate a random sequence and stores it
   # as a Route
-  def getRandomSolution(size, search_space):
+  def getRandomSolution(size, min, max):
     chromosome = Chromosome()
-    min, max = search_space
-    for _ in range(size):
-      chromosome.append(min + (random.random() * (max - min)))
+    for i in range(size):
+      chromosome.append(min[i] + (random.random() * (max[i] - min[i])))
     return chromosome
 
 
@@ -135,8 +134,11 @@ class Solver:
     self.sigma = sigma
     self.gamma = gamma
 
+    min = [self.search_space[0] for _ in range(self.nvars)]
+    max = [self.search_space[1] for _ in range(self.nvars)]
+
     # initialized with a group of random particles (solutions)
-    solutions = Particle.getRandomSolutions(self.nvars, search_space, self.population_size)
+    solutions = Particle.getRandomSolutions(self.nvars, min, max, self.population_size)
     print("One initial solution: ", solutions[0])
     
     # checks if exists any solution
@@ -151,7 +153,7 @@ class Solver:
       bestCost = self.evaluateSolutionsAverageCost(solutions)
     
       for _ in range(5):
-        solutions = Particle.getRandomSolutions(self.nvars, self.search_space, self.population_size)
+        solutions = Particle.getRandomSolutions(self.nvars, min, max, self.population_size)
         cost = self.evaluateSolutionsAverageCost(solutions)
         if cost < bestCost:
           bestCost = cost
@@ -162,7 +164,7 @@ class Solver:
       mostDiverse = self.evaluateSolutionsDiversity(solutions)
     
       for _ in range(5):
-        solutions = Particle.getRandomSolutions(self.nvars, self.search_space, self.population_size)
+        solutions = Particle.getRandomSolutions(self.nvars, min, max, self.population_size)
         sim = self.evaluateSolutionsDiversity(solutions)
         print("Diversity of the population: ", sim)
         #cost = self.evaluateSolutionsAverageCost(solutions)
@@ -184,9 +186,9 @@ class Solver:
       elif self.gbest.getCostPBest() > particle.getCostPBest():
         self.gbest = copy.deepcopy(particle)
 
-  def initPopulation(self, population_size):
+  def initPopulation(self, population_size, min, max):
     self.particles = [] # list of particles
-    solutions = Particle.getRandomSolutions(self.nvars, self.search_space, population_size)
+    solutions = Particle.getRandomSolutions(self.nvars, min, max, population_size)
     self.population_size = population_size
     
     # checks if exists any solution
@@ -199,7 +201,7 @@ class Solver:
     bestCost = self.evaluateSolutionsAverageCost(solutions)    
     
     for _ in range(5):
-      solutions = Particle.getRandomSolutions(self.nvars, self.search_space, self.population_size)
+      solutions = Particle.getRandomSolutions(self.nvars, min, max, self.population_size)
       cost = self.evaluateSolutionsAverageCost(solutions)
       if cost < bestCost:
         bestCost = cost
@@ -267,7 +269,7 @@ class Solver:
 
     HISTORY_SIZE = 100
     
-    record_values = [['Epoch'] + ['x'+str(i+1)+'='+str(int(functions_solution[self.cost_function][i])) for i in range(self.nvars)] + ['max x'+str(i+1) for i in range(self.nvars)] + ['min x'+str(i+1) for i in range(self.nvars)]]
+    record_values = [['Epoch'] + ['x'+str(i+1)+'='+str(int(functions_solution[self.cost_function.__name__][i])) for i in range(self.nvars)] + ['max x'+str(i+1) for i in range(self.nvars)] + ['min x'+str(i+1) for i in range(self.nvars)]]
     epoch = 0
     while epoch < self.max_epochs:
       print("Epoch: ", epoch, "with ", self.population_size, " particles")
@@ -276,13 +278,21 @@ class Solver:
       convergencePerEpoch = []
 
       if epoch > 0:
-        self.initPopulation(self.population_size)
+        self.initPopulation(self.population_size, min_values, max_values)
         print("Particles: ", len(self.particles))
         # Insert the best individual into the new population (1% of the population)
         if random.uniform(0,1.0) < 1.0:
-          mutated_elite = getattr(self, self.mutation_type)(self.gbest.getPBest(), *self.search_space)
+          if self.mutation_type == 'mutateGoodSolution':
+            mutated_elite = getattr(self, self.mutation_type)(particle.getCurrentSolution(), [self.search_space[0] for _ in range(self.nvars)], [self.search_space[1] for _ in range(self.nvars)])
+          elif self.mutation_type == 'mutateGoodSolutionMuSigma':
+            mutated_elite = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
           print("Inserted elite solution!")
+      else:
+          variables = zip(*self.getCurrentSolutions())
+          max_values = list(map(max, variables))
+          variables = zip(*self.getCurrentSolutions())
+          min_values = list(map(min, variables))
 
       # for each time step (iteration)
       for t in range(self.iterations):
@@ -308,8 +318,8 @@ class Solver:
             particle.history.pop(0)
           
           if self.mutation_type == 'mutateGoodSolution':
-            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
-            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min(min_values), max(max_values))
+            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min_values, max_values)
           elif self.mutation_type == 'mutateGoodSolutionMuSigma':
             bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           bestNeighborCost = self.cost_function(*bestNeighbor)
@@ -433,7 +443,7 @@ class Solver:
   def mutateGoodSolution(self, elite_solution, min, max):
     point = random.randint(0, len(elite_solution)-1)
     chromosome = elite_solution[:]
-    chromosome[point] = min + (random.random() * (max - min))
+    chromosome[point] = min[point] + (random.random() * (max[point] - min[point]))
     return chromosome
 
   # Crossover operator
@@ -580,7 +590,7 @@ if __name__ == "__main__":
     results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
     fileoutput = []
     fileoutput.append(results)
-    for i in range(15):
+    for i in range(5):
       results = []
       pso = Solver(globals()[function], functions_search_space[function], iterations=200, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
       start_time = datetime.now()
