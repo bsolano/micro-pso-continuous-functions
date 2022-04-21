@@ -10,15 +10,12 @@
 # Date: October 27, 2021
 ####################################################################################
 
-from operator import attrgetter
-import random, sys, time, copy
+import random, sys, copy
 import random
 import copy
 import csv
-import math
 import statistics
 from datetime import datetime
-from datetime import timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
 from benchmark_functions import *
