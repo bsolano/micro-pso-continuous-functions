@@ -5,6 +5,7 @@
 # The program reuses part of the code of Marco Castro (https://github.com/marcoscastro/tsp_pso)
 #  
 # Author: Rafael Batres
+# Contributor: Braulio Solano
 # Institution: Tecnologico de Monterrey
 # 
 # Date: October 27, 2021
