@@ -140,7 +140,20 @@ class PSO:
         r2 = random.random()
         velocity = [self.inertia*velocity[i] + self.p_confidence*r1*(pbest[i]-currentSolution[i]) + self.s_confidence*r2*(gbest[i]-currentSolution[i]) for i in range(len(velocity))]
         particle.setVelocity(velocity)
-                
+
+        # If we collide with the limits, the limit is the solution and velocity is cero
+        for i in range(len(velocity)):
+            if currentSolution[i] < self.search_space[0]:
+                currentSolution[i] = self.search_space[0]
+                velocity[i] = 0.0
+                particle.setVelocity(velocity)
+
+
+            if currentSolution[i] > self.search_space[1]:
+                currentSolution[i] = self.search_space[1]
+                velocity[i] = 0.0
+                particle.setVelocity(velocity)
+
         # new solution
         newSolution = [currentSolution[i] + velocity[i] for i in range(len(currentSolution))]
         
