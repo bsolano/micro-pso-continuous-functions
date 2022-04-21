@@ -454,7 +454,7 @@ if __name__ == "__main__":
   function = 'biggs_exp4'
   if run_experiment == True:
     fileoutput = []
-    results = ['Beta','Alfa'] + ['run'+str(i+1) for i in range(20)] + ['Mean','Exact results']
+    results = ['Beta','Alfa'] + ['run'+str(i+1) for i in range(20)] + ['Mean','Exact results', 'Mean epochs']
     fileoutput.append(results)
     parameters_space = [[0.64173937, 0.3609376],
                         [0.51559771, 0.95298392],
@@ -480,17 +480,21 @@ if __name__ == "__main__":
       mean_cost = 0
       results = parameters
       exact_results = 0
+      epochs = 0
       for i in range(20):
-        pso = Solver(globals()[function], functions_search_space[function], iterations=200, max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1])
+        pso = Solver(globals()[function], functions_search_space[function], iterations=300, max_epochs=50, population_size=10, beta=parameters[0], alfa=parameters[1])
         pso.run() # runs the PSO algorithm
         cost = pso.getGBest().getCostPBest()
         results.append(cost)
         if cost == 0.0:
           exact_results += 1
         mean_cost += cost
+        epochs += pso.getEpoch()
       mean_cost /= 20.0
+      epochs /= 20.0
       results.append(mean_cost)
       results.append(exact_results)
+      results.append(epochs)
       fileoutput.append(results)
   else:
     results = ["Function", "OptimumSolution", "Solution", "Cost", "Comp. time", "Epochs"]
