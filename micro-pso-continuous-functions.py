@@ -456,7 +456,7 @@ if __name__ == "__main__":
   # beta is the probability for a global best movement
   run_experiment = True
   function = 'biggs_exp4'
-  if run_experiment == True:
+  if run_experiment == False:
     fileoutput = []
     results = ['Beta','Alfa','Iterations','Crossover type','Mutation type','Mu','Sigma','Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean','Exact results']
     fileoutput.append(results)
@@ -570,7 +570,7 @@ if __name__ == "__main__":
     fileoutput.append(results)
     for i in range(5):
       results = []
-      pso = Solver(globals()[function], functions_search_space[function], iterations=100, max_epochs=500, population_size=10, beta=0.29, alfa=0.12)
+      pso = Solver(globals()[function], functions_search_space[function], iterations=250, max_epochs=500, population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
       start_time = datetime.now()
       pso.run() # runs the PSO algorithm
       results.append(function)
