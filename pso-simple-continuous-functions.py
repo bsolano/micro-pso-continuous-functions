@@ -321,7 +321,7 @@ if __name__ == "__main__":
     fileoutput = []
     fileoutput.append(results)
     function = 'biggs_exp4'
-    for i in range(30):
+    for i in range(50):
         results = []
         pso = PSO(globals()[function], functions_search_space[function], iterations=50000,
                   population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
