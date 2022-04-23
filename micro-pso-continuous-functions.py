@@ -479,7 +479,7 @@ class Chromosome(list):
         self.elements = []
 
 
-def experiment_parallel_run_loop(parameters):
+def experiment_parallel_run_loop(function, parameters):
     start_time = datetime.now()
     dt = datetime.now() - start_time
     pso = Solver(globals()[function], functions_search_space[function], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
@@ -490,13 +490,13 @@ def experiment_parallel_run_loop(parameters):
     return (cost, 1 if cost == 0.0 else 0, pso.getEpoch(), ms)
 
 
-def experiment_parallel_loop(parameters):
+def experiment_parallel_loop(function, parameters):
     mean_cost = 0
     results = parameters
     exact_results = 0
     mean_epochs = 0
     mean_time = 0
-    runs = Parallel(n_jobs=10)(delayed(experiment_parallel_run_loop)(parameters) for _ in range(20))
+    runs = Parallel(n_jobs=10)(delayed(experiment_parallel_run_loop)(function, parameters) for _ in range(20))
     for i in range(20):
         mean_cost += runs[i][0]
         exact_results += runs[i][1]
@@ -536,7 +536,7 @@ def experiment():
                         [0.82806744, 0.73347326],
                         [0.24536891, 0.6895526],
                         [0.79578451, 0.48056147]]
-    runs = Parallel(n_jobs=6)(delayed(experiment_parallel_loop)(parameters) for parameters in parameters_space)
+    runs = Parallel(n_jobs=6)(delayed(experiment_parallel_loop)(function, parameters) for parameters in parameters_space)
     fileoutput.append(runs)
 
     csvFile = open('micro-pso-continuous-experiment.csv', 'w', newline='')
@@ -553,7 +553,7 @@ if __name__ == "__main__":
     run_experiment = True
     function = 'biggs_exp4'
     if run_experiment == True:
-        experiment()
+        experiment(function)
     else:
         results = ["Function", "OptimumSolution",
                    "Solution", "Cost", "Comp. time", "Epochs"]
