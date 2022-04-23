@@ -561,7 +561,8 @@ if __name__ == "__main__":
         fileoutput.append(results)
         for i in range(5):
             results = []
-            pso = Solver(globals()[function], functions_search_space[function], iterations=250, max_epochs=500, population_size=10,
+            f_x = globals()[function]
+            pso = Solver(f_x, functions_search_space[function], iterations=250, max_epochs=500, population_size=10,
                          beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
             start_time = datetime.now()
             pso.run()  # runs the PSO algorithm
