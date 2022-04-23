@@ -511,7 +511,7 @@ def experiment_parallel_loop(function, parameters):
     results.append(mean_time)
 
 
-def experiment():
+def experiment(function):
     fileoutput = []
     results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
                'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs', 'Mean time']
