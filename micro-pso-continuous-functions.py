@@ -30,8 +30,6 @@ from math import isclose
 from joblib import Parallel, delayed
 
 # class that represents a particle
-
-
 class Particle:
 
     def __init__(self, solution, cost):
@@ -482,8 +480,7 @@ class Chromosome(list):
 def experiment_parallel_run_loop(function, parameters):
     start_time = datetime.now()
     dt = datetime.now() - start_time
-    f_x = globals()[function]
-    pso = Solver(f_x, functions_search_space[function], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
+    pso = Solver(function, functions_search_space[function.__name__], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
                  population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
     pso.run()  # runs the PSO algorithm
     cost = pso.getGBest().getCostPBest()
@@ -552,7 +549,8 @@ if __name__ == "__main__":
     # creates a PSO instance
     # beta is the probability for a global best movement
     run_experiment = True
-    function = 'biggs_exp4'
+    function_name = 'biggs_exp4'
+    function = globals()[function_name]
     if run_experiment == True:
         experiment(function)
     else:
@@ -562,7 +560,7 @@ if __name__ == "__main__":
         fileoutput.append(results)
         for i in range(5):
             results = []
-            pso = Solver(globals()[function], functions_search_space[function], iterations=250, max_epochs=500, population_size=10,
+            pso = Solver(globals()[function_name], functions_search_space[function_name], iterations=250, max_epochs=500, population_size=10,
                          beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
             start_time = datetime.now()
             pso.run()  # runs the PSO algorithm
