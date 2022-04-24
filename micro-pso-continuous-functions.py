@@ -507,6 +507,7 @@ def experiment_parallel_loop(function, parameters):
     results.append(exact_results)
     results.append(mean_epochs)
     results.append(mean_time)
+    return results
 
 
 def experiment(function):
