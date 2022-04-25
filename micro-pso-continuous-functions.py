@@ -27,8 +27,6 @@ from benchmark_functions import *
 from inspect import signature
 from math import isclose
 
-from joblib import Parallel, delayed
-
 # class that represents a particle
 class Particle:
 
