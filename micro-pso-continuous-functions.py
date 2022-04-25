@@ -477,74 +477,6 @@ class Chromosome(list):
         self.elements = []
 
 
-def experiment_parallel_run_loop(function, parameters):
-    start_time = datetime.now()
-    dt = datetime.now() - start_time
-    pso = Solver(function, functions_search_space[function.__name__], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
-                 population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
-    pso.run()  # runs the PSO algorithm
-    cost = pso.getGBest().getCostPBest()
-    ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-    return (cost, 1 if cost == 0.0 else 0, pso.getEpoch(), ms)
-
-
-def experiment_parallel_loop(function, parameters):
-    mean_cost = 0
-    results = parameters
-    exact_results = 0
-    mean_epochs = 0
-    mean_time = 0
-    runs = Parallel(n_jobs=10)(delayed(experiment_parallel_run_loop)(function, parameters) for _ in range(20))
-    for i in range(20):
-        mean_cost += runs[i][0]
-        exact_results += runs[i][1]
-        mean_epochs += runs[i][2]
-        mean_time += runs[i][3]
-    mean_cost /= 20.0
-    mean_epochs /= 20.0
-    mean_time /= 20.0
-    results.append(mean_cost)
-    results.append(exact_results)
-    results.append(mean_epochs)
-    results.append(mean_time)
-    return results
-
-
-def experiment(function):
-    fileoutput = []
-    results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
-               'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs', 'Mean time']
-    fileoutput.append(results)
-    parameters_space = [[0.64173937, 0.3609376],
-                        [0.51559771, 0.95298392],
-                        [0.3560774,  0.26500581],
-                        [0.96260928, 0.82126358],
-                        [0.68207588, 0.12677738],
-                        [0.27819921, 0.09201003],
-                        [0.12358181, 0.76814224],
-                        [0.34373103, 0.92170513],
-                        [0.04371207, 0.0384513],
-                        [0.91322373, 0.42522076],
-                        [0.73455707, 0.17863831],
-                        [0.08077035, 0.85692541],
-                        [0.46210794, 0.56074551],
-                        [0.40062785, 0.52164894],
-                        [0.89165849, 0.61570168],
-                        [0.57651109, 0.24399474],
-                        [0.1828317,  0.32957296],
-                        [0.82806744, 0.73347326],
-                        [0.24536891, 0.6895526],
-                        [0.79578451, 0.48056147]]
-    runs = Parallel(n_jobs=6)(delayed(experiment_parallel_loop)(function, parameters) for parameters in parameters_space)
-    fileoutput.append(runs)
-
-    csvFile = open('micro-pso-continuous-experiment.csv', 'w', newline='')
-    with csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerows(fileoutput)
-    csvFile.close()
-
-
 if __name__ == "__main__":
 
     # creates a PSO instance
@@ -553,7 +485,62 @@ if __name__ == "__main__":
     function_name = 'biggs_exp4'
     function = globals()[function_name]
     if run_experiment == True:
-        experiment(function)
+        fileoutput = []
+        results = ['Iterations', 'Max epochs'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs', 'Mean time']
+        fileoutput.append(results)
+        parameters_space = [[0.64173937, 0.3609376],
+                            [0.51559771, 0.95298392],
+                            [0.3560774,  0.26500581],
+                            [0.96260928, 0.82126358],
+                            [0.68207588, 0.12677738],
+                            [0.27819921, 0.09201003],
+                            [0.12358181, 0.76814224],
+                            [0.34373103, 0.92170513],
+                            [0.04371207, 0.0384513],
+                            [0.91322373, 0.42522076],
+                            [0.73455707, 0.17863831],
+                            [0.08077035, 0.85692541],
+                            [0.46210794, 0.56074551],
+                            [0.40062785, 0.52164894],
+                            [0.89165849, 0.61570168],
+                            [0.57651109, 0.24399474],
+                            [0.1828317,  0.32957296],
+                            [0.82806744, 0.73347326],
+                            [0.24536891, 0.6895526],
+                            [0.79578451, 0.48056147]]
+        for parameters in parameters_space:
+            mean_cost = 0
+            mean_epochs = 0
+            mean_time = 0
+            exact_results = 0
+            results = [int(parameters[0]*1000), int(parameters[1]*1000)]
+            for _ in range(20):
+                start_time = datetime.now()
+                dt = datetime.now() - start_time
+                pso = Solver(function, functions_search_space[function.__name__], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
+                            population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
+                pso.run()  # runs the PSO algorithm
+                cost = pso.getGBest().getCostPBest()
+                results.append(cost)
+                ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+                mean_cost += cost
+                exact_results += (1 if cost == 0.0 else 0)
+                mean_epochs += pso.getEpoch()
+                mean_time += ms
+            mean_cost /= 20.0
+            mean_epochs /= 20.0
+            mean_time /= 20.0
+            results.append(mean_cost)
+            results.append(exact_results)
+            results.append(mean_epochs)
+            results.append(mean_time)
+            fileoutput.append(results)
+
+        csvFile = open('micro-pso-continuous-experiment.csv', 'w', newline='')
+        with csvFile:
+            writer = csv.writer(csvFile)
+            writer.writerows(fileoutput)
+        csvFile.close()
     else:
         results = ["Function", "OptimumSolution",
                    "Solution", "Cost", "Comp. time", "Epochs"]
@@ -577,9 +564,9 @@ if __name__ == "__main__":
             results.append(epoch)
             fileoutput.append(results)
 
-    # pso-results.csv
-    csvFile = open('micro-pso-continuous.csv', 'w', newline='')
-    with csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerows(fileoutput)
-    csvFile.close()
+        # pso-results.csv
+        csvFile = open('micro-pso-continuous.csv', 'w', newline='')
+        with csvFile:
+            writer = csv.writer(csvFile)
+            writer.writerows(fileoutput)
+        csvFile.close()
