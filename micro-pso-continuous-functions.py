@@ -26,6 +26,7 @@ from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
 from math import isclose
+import numpy as np
 
 # class that represents a particle
 class Particle:
@@ -522,7 +523,7 @@ if __name__ == "__main__":
                 results.append(cost)
                 ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
                 mean_cost += cost
-                exact_results += (1 if cost == 0.0 else 0)
+                exact_results += (1 if np.allclose(pso.getGBest().getPBest(),functions_solution[function.__name__]) else 0)
                 mean_epochs += pso.getEpoch()
                 mean_time += ms
             mean_cost /= 20.0

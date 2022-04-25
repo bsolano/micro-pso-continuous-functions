@@ -19,14 +19,14 @@ functions_search_space = {
 }
 
 functions_solution = {
-    'beale': [3,0.5],
-    'biggs_exp2': [1,10],
-    'biggs_exp3': [1,10,5],
-    'biggs_exp4': [1,10,1,5],
-    'biggs_exp5': [1,10,1,5,4],
-    'biggs_exp6': [1,10,1,5,4,3],
+    'beale': [3.0,0.5],
+    'biggs_exp2': [1.0,10.0],
+    'biggs_exp3': [1.0,10.0,5.0],
+    'biggs_exp4': [1.0,10.0,1.0,5.0],
+    'biggs_exp5': [1.0,10.0,1.0,5.0,4.0],
+    'biggs_exp6': [1.0,10.0,1.0,5.0,4.0,3.0],
     'cross_in_tray': [1.349406685353340,1.349406608602084],
-    'drop_in_wave': [0,0]
+    'drop_in_wave': [0.0,0.0]
 }
 
 @njit
