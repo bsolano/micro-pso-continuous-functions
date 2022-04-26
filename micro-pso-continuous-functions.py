@@ -671,7 +671,7 @@ if __name__ == "__main__":
         results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
         fileoutput = []
         fileoutput.append(results)
-        for i in range(5):
+        for i in range(50):
             results = []
             start_time = process_time()
             pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
