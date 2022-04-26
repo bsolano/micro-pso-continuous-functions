@@ -23,7 +23,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from benchmark_functions import *
 from inspect import signature
+from time import process_time
 
+# For repeatability and reproducibility
+random.seed(0)
 
 # PSO algorithm
 class PSO:
@@ -94,9 +97,7 @@ class PSO:
 
     # returns the elapsed milliseconds since the start of the program
     def elapsedTime(self, start_time):
-        dt = datetime.now() - start_time
-        ms = (dt.days * 24 * 60 * 60 + dt.seconds) * \
-            1000 + dt.microseconds / 1000.0
+        ms = (process_time() - start_time) * 1000.0
         return ms
 
     def setIter(self, last_iter):
@@ -115,7 +116,7 @@ class PSO:
         batchSize = 100  # save data every n iterations
         batchCounter = 0
 
-        startTime = datetime.now()
+        startTime = process_time()
 
         # updates gbest (best particle of the population)
         for particle in self.particles:
@@ -316,25 +317,22 @@ if __name__ == "__main__":
     # creates a PSO instance
     # alfa is the probabiliy for a movement based on local best
     # beta is the probability for a movement based on the global best
-    results = ["Function", "OptimumSolution",
-               "Solution", "Cost", "Comp. time", "Epochs"]
+    function_name = 'biggs_exp4'
+    function = globals()[function_name]
+    results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Iterations']
     fileoutput = []
     fileoutput.append(results)
-    function = 'biggs_exp4'
     for i in range(50):
         results = []
-        pso = PSO(globals()[function], functions_search_space[function], iterations=50000,
-                  population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
-        start_time = datetime.now()
+        start_time = process_time()
+        pso = PSO(function, functions_search_space[function.__name__], iterations=50000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
         pso.run()  # runs the PSO algorithm
-        results.append(function)
-        results.append(functions_solution[function])
-        results.append(pso.getGBest().getPBest())
+        ms = (process_time() - start_time) * 1000.0
+        results.append(function.__name__)
+        results += functions_solution[function.__name__]
+        results += pso.getGBest().getPBest()
         results.append(pso.getGBest().getCostPBest())
         iteration = pso.getIter()
-        dt = datetime.now() - start_time
-        ms = (dt.days * 24 * 60 * 60 + dt.seconds) * \
-            1000 + dt.microseconds / 1000.0
         results.append(ms)
         results.append(iteration)
         fileoutput.append(results)

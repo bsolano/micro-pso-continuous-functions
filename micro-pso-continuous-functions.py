@@ -28,6 +28,10 @@ from math import isclose
 from time import process_time
 import numpy as np
 
+# For repeatability and reproducibility
+np.random.seed(0)
+random.seed(0)
+
 # class that represents a particle
 class Particle:
 
@@ -664,22 +668,19 @@ if __name__ == "__main__":
             results.append(exact_results)
             fileoutput.append(results)
     else:
-        results = ["Function", "OptimumSolution",
-                   "Solution", "Cost", "Comp. time", "Epochs"]
+        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
         fileoutput = []
         fileoutput.append(results)
         for i in range(5):
             results = []
             start_time = process_time()
-            pso = Solver(function, functions_search_space[function.__name__], iterations=200, max_epochs=300, population_size=10,
+            pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
                          beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
             pso.run()  # runs the PSO algorithm
-            ms = (process_time() - start_time) / 1000.0
-            #dt = datetime.now() - start_time
-            #ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-            results.append(function)
-            results.append(functions_solution[function])
-            results.append(pso.getGBest().getPBest())
+            ms = (process_time() - start_time) * 1000.0
+            results.append(function.__name__)
+            results += functions_solution[function.__name__]
+            results += pso.getGBest().getPBest()
             results.append(pso.getGBest().getCostPBest())
             epoch = pso.getEpoch()
             results.append(ms)
