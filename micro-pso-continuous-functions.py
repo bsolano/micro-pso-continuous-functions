@@ -27,6 +27,7 @@ from benchmark_functions import *
 from inspect import signature
 from math import isclose
 import numpy as np
+from time import process_time
 
 # class that represents a particle
 class Particle:
@@ -514,18 +515,16 @@ if __name__ == "__main__":
             exact_results = 0
             results = [int(parameters[0]*1000), int(parameters[1]*1000)]
             for _ in range(20):
-                start_time = datetime.now()
-                dt = datetime.now() - start_time
+                start_time = process_time()
                 pso = Solver(function, functions_search_space[function.__name__], iterations=int(parameters[0]*1000), max_epochs=int(parameters[1]*1000),
                             population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
+                mean_time += process_time() - start_time
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
-                ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
                 mean_cost += cost
                 exact_results += (1 if np.allclose(pso.getGBest().getPBest(),functions_solution[function.__name__]) else 0)
                 mean_epochs += pso.getEpoch()
-                mean_time += ms
             mean_cost /= 20.0
             mean_epochs /= 20.0
             mean_time /= 20.0
