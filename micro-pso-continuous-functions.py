@@ -16,7 +16,6 @@ import random
 import copy
 import csv
 import statistics
-from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,7 +23,8 @@ from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
 from math import isclose
-
+from time import process_time
+import numpy as np
     
 # class that represents a particle
 class Particle:
@@ -277,11 +277,9 @@ class Solver:
       if epoch > 0:
         self.initPopulation(self.population_size)
         print("Particles: ", len(self.particles))
-        # Insert the best individual into the new population (1% of the population)
-        if random.uniform(0,1.0) < 1.0:
-          mutated_elite = getattr(self, self.mutation_type)(self.gbest.getPBest(), *self.search_space)
-          self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
-          print("Inserted elite solution!")
+        mutated_elite = getattr(self, self.mutation_type)(self.gbest.getPBest(), *self.search_space)
+        self.particles[random.randint(0, self.population_size-1)]  = Particle(mutated_elite, self.gbest.getCostPBest())
+        print("Inserted elite solution!")
     
       # for each time step (iteration)
       for t in range(self.iterations):
@@ -291,11 +289,6 @@ class Solver:
         averageCost = statistics.mean(particle.pbestCost for particle in self.particles)
         costStd = statistics.pstdev(particle.pbestCost for particle in self.particles)
 
-        if self.mutation_type == 'mutateGoodSolution':
-          variables = zip(*self.getCurrentSolutions())
-          max_values = list(map(max, variables))
-          variables = zip(*self.getCurrentSolutions())
-          min_values = list(map(min, variables))
         # for each particle in the swarm
         for particle in self.particles:
           previousCost = particle.getCurrentSolutionCost()
@@ -307,8 +300,7 @@ class Solver:
             particle.history.pop(0)
           
           if self.mutation_type == 'mutateGoodSolution':
-            #bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
-            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), min(min_values), max(max_values))
+            bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), *self.search_space)
           elif self.mutation_type == 'mutateGoodSolutionMuSigma':
             bestNeighbor = getattr(self, self.mutation_type)(particle.getCurrentSolution(), self.mu, self.sigma)
           bestNeighborCost = self.cost_function(*bestNeighbor)
@@ -454,9 +446,10 @@ if __name__ == "__main__":
 
   # creates a PSO instance
   # beta is the probability for a global best movement
-  run_experiment = True
-  function = 'biggs_exp4'
-  if run_experiment == False:
+  run_experiment = False
+  function_name = 'biggs_exp4'
+  function = globals()[function_name]
+  if run_experiment == True:
     fileoutput = []
     results = ['Beta','Alfa','Iterations','Crossover type','Mutation type','Mu','Sigma','Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean','Exact results']
     fileoutput.append(results)
@@ -553,12 +546,11 @@ if __name__ == "__main__":
           mutation_type='mutateGoodSolution'
         else:
           mutation_type='mutateGoodSolutionMuSigma'
-        pso = Solver(globals()[function], functions_search_space[function], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(50 + (parameters[2] * (250 - 50))), crossover_type=crossover_type, mutation_type=mutation_type, mu=parameters[5], sigma=parameters[6], gamma=parameters[7])
+        pso = Solver(function, functions_search_space[function.__name__], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(50 + (parameters[2] * (250 - 50))), crossover_type=crossover_type, mutation_type=mutation_type, mu=parameters[5], sigma=parameters[6], gamma=parameters[7])
         pso.run() # runs the PSO algorithm
         cost = pso.getGBest().getCostPBest()
         results.append(cost)
-        if cost == 0.0:
-          exact_results += 1
+        exact_results += (1 if np.allclose(pso.getGBest().getPBest(),functions_solution[function.__name__]) else 0)
         mean_cost += cost
       mean_cost /= 20.0
       results.append(mean_cost)
@@ -570,16 +562,17 @@ if __name__ == "__main__":
     fileoutput.append(results)
     for i in range(5):
       results = []
-      pso = Solver(globals()[function], functions_search_space[function], iterations=250, max_epochs=500, population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
-      start_time = datetime.now()
+      start_time = process_time()
+      pso = Solver(function, functions_search_space[function.__name__], iterations=200, max_epochs=300, population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
       pso.run() # runs the PSO algorithm
+      ms = (process_time() - start_time) / 1000.0
+      #dt = datetime.now() - start_time
+      #ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
       results.append(function)
       results.append(functions_solution[function])
       results.append(pso.getGBest().getPBest())
       results.append(pso.getGBest().getCostPBest())
       epoch = pso.getEpoch()
-      dt = datetime.now() - start_time
-      ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
       results.append(ms)
       results.append(epoch)
       fileoutput.append(results)
