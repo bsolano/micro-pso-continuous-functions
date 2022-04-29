@@ -17,13 +17,13 @@ import copy
 import random
 import copy
 import csv
-import statistics
-from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 from benchmark_functions import *
 from inspect import signature
+from math import isclose
 from time import process_time
+import numpy as np
 
 # For repeatability and reproducibility
 random.seed(0)
@@ -200,14 +200,14 @@ class PSO:
 
             t = t + 1
             if t > 220:
-                std = statistics.pstdev(bestCostSampling[-10:])
+                std = np.std(bestCostSampling[-10:])
             else:
                 std = 1000
 
             if t == self.iterations:
                 self.setIter(t)
 
-            if std == 0:
+            if isclose(std, 0):
                 self.setIter(t)
                 break
 
