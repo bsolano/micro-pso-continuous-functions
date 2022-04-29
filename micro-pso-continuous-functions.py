@@ -667,32 +667,35 @@ if __name__ == "__main__":
             results.append(mean_cost)
             results.append(exact_results)
             fileoutput.append(results)
-    else:
-        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
-        fileoutput = []
-        fileoutput.append(results)
-        for i in range(50):
-            results = []
-            start_time = process_time()
-            pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
-                         beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
-            pso.run()  # runs the PSO algorithm
-            ms = (process_time() - start_time) * 1000.0
-            results.append(function.__name__)
-            results += functions_solution[function.__name__]
-            results += pso.getGBest().getPBest()
-            results.append(pso.getGBest().getCostPBest())
-            epoch = pso.getEpoch()
-            results.append(ms)
-            results.append(epoch)
-            fileoutput.append(results)
 
-    # pso-results.csv
-    if run_experiment == True:
+        # pso-results.csv
         csvFile = open('micro-pso-continuous-experiment.csv', 'w', newline='')
-    else:
-        csvFile = open('micro-pso-continuous.csv', 'w', newline='')
-    with csvFile:
         writer = csv.writer(csvFile)
         writer.writerows(fileoutput)
-    csvFile.close()
+        csvFile.close()
+    else:
+        for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
+            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
+            fileoutput = []
+            fileoutput.append(results)
+            for i in range(30):
+                results = []
+                start_time = process_time()
+                pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
+                            beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
+                pso.run()  # runs the PSO algorithm
+                ms = (process_time() - start_time) * 1000.0
+                results.append(function.__name__)
+                results += functions_solution[function.__name__]
+                results += pso.getGBest().getPBest()
+                results.append(pso.getGBest().getCostPBest())
+                epoch = pso.getEpoch()
+                results.append(ms)
+                results.append(epoch)
+                fileoutput.append(results)
+
+            # pso-results.csv
+            csvFile = open('micro-pso-continuous-'+function_name+'.csv', 'w', newline='')
+            writer = csv.writer(csvFile)
+            writer.writerows(fileoutput)
+            csvFile.close()

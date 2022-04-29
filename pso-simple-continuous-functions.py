@@ -317,33 +317,33 @@ if __name__ == "__main__":
     # creates a PSO instance
     # alfa is the probabiliy for a movement based on local best
     # beta is the probability for a movement based on the global best
-    function_name = 'biggs_exp4'
-    function = globals()[function_name]
-    results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Iterations']
-    fileoutput = []
-    fileoutput.append(results)
-    for i in range(50):
-        results = []
-        start_time = process_time()
-        pso = PSO(function, functions_search_space[function.__name__], iterations=50000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
-        pso.run()  # runs the PSO algorithm
-        ms = (process_time() - start_time) * 1000.0
-        results.append(function.__name__)
-        results += functions_solution[function.__name__]
-        results += pso.getGBest().getPBest()
-        results.append(pso.getGBest().getCostPBest())
-        iteration = pso.getIter()
-        results.append(ms)
-        results.append(iteration)
+    for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
+        function = globals()[function_name]
+        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Iterations']
+        fileoutput = []
         fileoutput.append(results)
-        # shows the global best particle
-        print("Cost of gbest: ", "{:.20f}".format(
-            pso.getGBest().getCostPBest()))
-        print("gbest: ", pso.getGBest().getPBest())
-        print("")
+        for i in range(30):
+            results = []
+            start_time = process_time()
+            pso = PSO(function, functions_search_space[function.__name__], iterations=50000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
+            pso.run()  # runs the PSO algorithm
+            ms = (process_time() - start_time) * 1000.0
+            results.append(function.__name__)
+            results += functions_solution[function.__name__]
+            results += pso.getGBest().getPBest()
+            results.append(pso.getGBest().getCostPBest())
+            iteration = pso.getIter()
+            results.append(ms)
+            results.append(iteration)
+            fileoutput.append(results)
+            # shows the global best particle
+            print("Cost of gbest: ", "{:.20f}".format(
+                pso.getGBest().getCostPBest()))
+            print("gbest: ", pso.getGBest().getPBest())
+            print("")
 
-    csvFile = open('pso-simple-continuous-functions.csv', 'w', newline='')
-    with csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerows(fileoutput)
-    csvFile.close()
+        csvFile = open('pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')
+        with csvFile:
+            writer = csv.writer(csvFile)
+            writer.writerows(fileoutput)
+        csvFile.close()
