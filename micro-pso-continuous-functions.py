@@ -303,10 +303,8 @@ class Solver:
                 convergencePerIteration = []
                 batchCounter = batchCounter + 1
 
-                averageCost = np.mean(
-                    particle.pbestCost for particle in self.particles)
-                costStd = np.std(
-                    particle.pbestCost for particle in self.particles)
+                averageCost = np.mean([particle.pbestCost for particle in self.particles])
+                costStd = np.std([particle.pbestCost for particle in self.particles])
 
                 # for each particle in the swarm
                 for particle in self.particles:
