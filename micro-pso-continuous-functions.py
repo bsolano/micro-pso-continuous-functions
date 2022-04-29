@@ -477,9 +477,9 @@ if __name__ == "__main__":
     # creates a PSO instance
     # beta is the probability for a global best movement
     run_experiment = False
-    function_name = 'biggs_exp4'
-    function = globals()[function_name]
     if run_experiment == True:
+        function_name = 'biggs_exp4'
+        function = globals()[function_name]
         fileoutput = []
         results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
                    'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results']
@@ -675,6 +675,7 @@ if __name__ == "__main__":
         csvFile.close()
     else:
         for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
+            function = globals()[function_name]
             results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
