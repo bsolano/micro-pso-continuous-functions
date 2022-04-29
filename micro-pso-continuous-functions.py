@@ -17,7 +17,6 @@ import copy
 import random
 import copy
 import csv
-import statistics
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -304,9 +303,9 @@ class Solver:
                 convergencePerIteration = []
                 batchCounter = batchCounter + 1
 
-                averageCost = statistics.mean(
+                averageCost = np.mean(
                     particle.pbestCost for particle in self.particles)
-                costStd = statistics.pstdev(
+                costStd = np.std(
                     particle.pbestCost for particle in self.particles)
 
                 # for each particle in the swarm
@@ -403,7 +402,7 @@ class Solver:
             self.setEpoch(epoch)
             bestCostSampling.append(self.gbest.getCostPBest())
             if epoch > 5:
-                std = statistics.pstdev(bestCostSampling[-10:])
+                std = np.std(bestCostSampling[-10:])
                 print("standard deviation: ", std)
             else:
                 std = 1000
