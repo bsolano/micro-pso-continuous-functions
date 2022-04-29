@@ -31,7 +31,7 @@ functions_search_space = {
 }
 
 functions_solution = {
-    'beale': [3, 0.5],
+    'beale': [3, 0.5, 0.5],
     'biggs_exp2': [1, 10],
     'biggs_exp3': [1, 10, 5],
     'biggs_exp4': [1, 10, 1, 5],
