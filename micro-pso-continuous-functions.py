@@ -672,7 +672,7 @@ if __name__ == "__main__":
     else:
         for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
             function = globals()[function_name]
-            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
+            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
             for i in range(30):
@@ -685,7 +685,9 @@ if __name__ == "__main__":
                 results.append(function.__name__)
                 results += functions_solution[function.__name__]
                 results += pso.getGBest().getPBest()
-                results.append(euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__]))
+                euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
+                results.append(euclidean_distance)
+                results.append(1 if np.isclose(euclidean_distance, 0.0) else 0)
                 results.append(pso.getGBest().getCostPBest())
                 results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__])) else 0)
                 epoch = pso.getEpoch()
