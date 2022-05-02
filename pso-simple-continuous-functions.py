@@ -334,7 +334,7 @@ if __name__ == "__main__":
             results += pso.getGBest().getPBest()
             results.append(pso.getGBest().getCostPBest())
             results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
-            results.append(1 if isclose(function(functions_solution[function.__name__])) else 0)
+            results.append(1 if isclose(pso.getGBest().getCostPBest(), function(functions_solution[function.__name__])) else 0)
             iteration = pso.getIter()
             results.append(ms)
             results.append(iteration)
