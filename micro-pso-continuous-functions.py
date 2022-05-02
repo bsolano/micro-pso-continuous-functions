@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-
 ####################################################################################
 # A Particle Swarm Optimization algorithm to find functions optimum.
 #
 #
-# Author: Rafael Batres
-# Contributor: Braulio Solano
+# Author: Rafael Batres-Pietro
+# Author: Braulio J. Solano-Rojas
 # Institution: Tecnológico de Monterrey
-# Date: June 6, 2018 - April 2022
+# Date: June 6, 2018. April-May 2022
 ####################################################################################
 
 import random
@@ -673,7 +672,7 @@ if __name__ == "__main__":
     else:
         for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
             function = globals()[function_name]
-            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Epochs']
+            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Exact solution', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
             for i in range(30):
@@ -687,6 +686,8 @@ if __name__ == "__main__":
                 results += functions_solution[function.__name__]
                 results += pso.getGBest().getPBest()
                 results.append(pso.getGBest().getCostPBest())
+                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
+                results.append(1 if isclose(function(functions_solution[function.__name__])) else 0)
                 epoch = pso.getEpoch()
                 results.append(ms)
                 results.append(epoch)

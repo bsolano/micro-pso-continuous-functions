@@ -4,11 +4,11 @@
 # A Particle Swarm Optimization algorithm for solving the traveling salesman problem.
 # The program reuses part of the code of Marco Castro (https://github.com/marcoscastro/tsp_pso)
 #
-# Author: Rafael Batres
-# Contributor: Braulio Solano
+# Author: Rafael Batres-Pietro
+# Author: Braulio J. Solano-Rojas
 # Institution: Tecnologico de Monterrey
 #
-# Date: October 27, 2021
+# Date: October 27, 2021.  April-May 2022
 ####################################################################################
 
 import random
@@ -26,6 +26,7 @@ from time import process_time
 import numpy as np
 
 # For repeatability and reproducibility
+np.random.seed(0)
 random.seed(0)
 
 # PSO algorithm
@@ -319,7 +320,7 @@ if __name__ == "__main__":
     # beta is the probability for a movement based on the global best
     for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock30','rastringin30','griewank30']:
         function = globals()[function_name]
-        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Comp. time', 'Iterations']
+        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Cost', 'Exact solution', 'Exact optimum', 'Comp. time', 'Iterations']
         fileoutput = []
         fileoutput.append(results)
         for i in range(30):
@@ -332,6 +333,8 @@ if __name__ == "__main__":
             results += functions_solution[function.__name__]
             results += pso.getGBest().getPBest()
             results.append(pso.getGBest().getCostPBest())
+            results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
+            results.append(1 if isclose(function(functions_solution[function.__name__])) else 0)
             iteration = pso.getIter()
             results.append(ms)
             results.append(iteration)
