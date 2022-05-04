@@ -683,7 +683,15 @@ if __name__ == "__main__":
                 results.append(function.__name__)
                 results += functions_solution[function.__name__]
                 results += pso.getGBest().getPBest()
-                euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
+                if isinstance(functions_solution[function.__name__][0], list):
+                    min = np.inf
+                    for solution in functions_solution[function.__name__]:
+                        euclidean_distance = euclidean(pso.getGBest().getPBest(), solution)
+                        if euclidean_distance < min:
+                            min = euclidean_distance
+                    euclidean_distance = min
+                else:
+                    euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
                 results.append(euclidean_distance)
                 results.append(1 if np.isclose(euclidean_distance, 0.0) else 0)
                 results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
