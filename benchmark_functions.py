@@ -130,7 +130,10 @@ def biggs_exp5(x1, x2, x3, x4, x5):
     for i in range(12):
         zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
-        sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + 3*exp(-x5*zi)) - yi)**2
+        try:
+            sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + 3*exp(-x5*zi)) - yi)**2
+        except OverflowError:
+            sum = inf
     return sum
 
 
