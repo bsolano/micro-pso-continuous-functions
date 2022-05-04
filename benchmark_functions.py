@@ -37,16 +37,35 @@ functions_solution = {
     'biggs_exp4': [1.0,10.0,1.0,5.0],
     'biggs_exp5': [1.0,10.0,1.0,5.0,4.0],
     'biggs_exp6': [1.0,10.0,1.0,5.0,4.0,3.0],
-    'cross_in_tray': [1.349406685353340, 1.349406608602084],
+    'cross_in_tray': [[1.349406685353340, 1.349406608602084], [1.349406685353340, -1.349406608602084], [-1.349406685353340, 1.349406608602084], [-1.349406685353340, -1.349406608602084]],
     'drop_in_wave': [0.0,0.0],
     'dejong_f1': [0.0,0.0,0.0],
     'dejong_f2': [1.0,1.0],
     'dejong_f3': [-5.12,-5.12,-5.12,-5.12,-5.12],
     'dejong_f4': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
     'dejong_f5': [-32.0,-32.0],
-    'rosenbrock30': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
-    'rastringin30': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
-    'griewank30': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'rosenbrock20': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rastringin20': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank1': [0.0],
+    'griewank2': [0.0,0.0],
+    'griewank3': [0.0,0.0,0.0],
+    'griewank4': [0.0,0.0,0.0,0.0],
+    'griewank5': [0.0,0.0,0.0,0.0,0.0],
+    'griewank6': [0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank7': [0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank8': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank9': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank10': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank11': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank12': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank13': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank14': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank15': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank16': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank17': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank18': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank19': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+    'griewank20': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
     'karaboga_akay': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,3.0,3.0,3.0,1.0]
 }
 
@@ -59,8 +78,8 @@ def beale(x1, x2, x3):
 @njit(cache=True)
 def biggs_exp2(x1, x2):
     sum = 0
-    for i in prange(1, 11):
-        zi = 0.1*i
+    for i in prange(10):
+        zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
         sum += ((exp(-x1*zi) - 5*exp(-x2*zi)) - yi)**2
     return sum
@@ -68,9 +87,9 @@ def biggs_exp2(x1, x2):
 
 @njit(cache=True)
 def biggs_exp3(x1, x2, x3):
-    sum = 0
-    for i in prange(1, 11):
-        zi = 0.1*i
+    sum = 0.0
+    for i in prange(10):
+        zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
         sum += ((exp(-x1*zi) - x3*exp(-x2*zi)) - yi)**2
     return sum
@@ -78,19 +97,19 @@ def biggs_exp3(x1, x2, x3):
 
 @njit(cache=True)
 def biggs_exp4(x1, x2, x3, x4):
-    sum = 0
-    for i in prange(1, 11):
-        zi = 0.1*i
+    sum = 0.0
+    for i in prange(10):
+        zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
         sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi)) - yi)**2
     return sum
 
 
-@njit(cache=True)
+# Numba has a bug and this function does not return a correct value with it
 def biggs_exp5(x1, x2, x3, x4, x5):
-    sum = 0
-    for i in prange(1, 11):
-        zi = 0.1*i
+    sum = 0.0
+    for i in range(12):
+        zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
         sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + 3*exp(-x5*zi)) - yi)**2
     return sum
@@ -98,9 +117,9 @@ def biggs_exp5(x1, x2, x3, x4, x5):
 
 @njit(cache=True)
 def biggs_exp6(x1, x2, x3, x4, x5, x6):
-    sum = 0
-    for i in prange(1, 11):
-        zi = 0.1*i
+    sum = 0.0
+    for i in prange(13):
+        zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
         sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + x6*exp(-x5*zi)) - yi)**2
     return sum
@@ -123,7 +142,7 @@ def dejong_f1(x1, x2, x3):
 
 @njit(cache=True)
 def dejong_f2(x1, x2):
-    return 100 * (x1**2-x2**2)**2 + (1-x1)**2
+    return 100 * (x2-x1**2)**2 + (1-x1)**2
 
 
 @njit(cache=True)
@@ -144,15 +163,16 @@ def f(j, x1, x2):
 
 @njit(cache=True)
 def dejong_f5(x1, x2):
-    sum = 0
+    sum = 0.0
     for j in prange(1,26):
         sum += 1/f(j,x1,x2)
     return 1 / (0.002 + sum)
 
 
-def rosenbrock30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30):
-    sum = 0
-    for i in prange(1,30):
+# locals does not work with numba
+def rosenbrock20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
+    sum = 0.0
+    for i in prange(1,20):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -160,18 +180,203 @@ def rosenbrock30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 
 @njit(cache=True)
-def rastringin30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30):
-    sum = 0
-    for x_i in (x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30):
+def rastringin20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
+    sum = 0.0
+    for x_i in (x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
         sum += x_i**2 - 10 * cos(2 * pi * x_i) + 10
     return sum
 
 
 @njit(cache=True)
-def griewank30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30):
-    sum = 0
-    mul = 1
-    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30), 1):
+def griewank1(x1):
+    return x1**2/4000 - cos(x1 / sqrt(1)) + 1
+
+
+@njit(cache=True)
+def griewank2(x1, x2):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank3(x1, x2, x3):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank4(x1, x2, x3, x4):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank5(x1, x2, x3, x4, x5):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank6(x1, x2, x3, x4, x5, x6):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank7(x1, x2, x3, x4, x5, x6, x7):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank8(x1, x2, x3, x4, x5, x6, x7, x8):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19), 1):
+        sum += x_i**2
+        mul *= cos(x_i / sqrt(i))
+    return sum/4000 - mul + 1
+
+
+@njit(cache=True)
+def griewank20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
+    sum = 0.0
+    mul = 1.0
+    for i, x_i in enumerate((x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20), 1):
         sum += x_i**2
         mul *= cos(x_i / sqrt(i))
     return sum/4000 - mul + 1
@@ -179,15 +384,15 @@ def griewank30(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
 
 @njit(cache=True)
 def karaboga_akay(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
-    sum1 = 0
+    sum1 = 0.0
     for x_i in (x1, x2, x3, x4):
         sum1 += x_i
 
-    sum2 = 0
+    sum2 = 0.0
     for x_i in (x1, x2, x3, x4):
         sum2 += x_i**2
 
-    sum3 = 0
+    sum3 = 0.0
     for x_i in (x5, x6, x7, x8, x9, x10, x11, x12, x13):
         sum3 += x_i
 
@@ -214,6 +419,7 @@ def karaboga_akay(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     else:
         return sum
 
+# For pre-caching:
 beale(3,0.5,0.5)
 biggs_exp2(1.0,10.0)
 biggs_exp3(1.0,10.0,5.0)
@@ -227,7 +433,26 @@ dejong_f2(1.0,1.0)
 dejong_f3(-5.12,-5.12,-5.12,-5.12,-5.12)
 dejong_f4(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 dejong_f5(-32.0,-32.0)
-rosenbrock30(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0)
-rastringin30(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
-griewank30(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+rosenbrock20(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0)
+rastringin20(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank1(0.0)
+griewank2(0.0,0.0)
+griewank3(0.0,0.0,0.0)
+griewank4(0.0,0.0,0.0,0.0)
+griewank5(0.0,0.0,0.0,0.0,0.0)
+griewank6(0.0,0.0,0.0,0.0,0.0,0.0)
+griewank7(0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank8(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank9(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank10(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank11(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank12(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank13(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank14(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank15(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank16(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank17(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank18(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank19(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+griewank20(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 karaboga_akay(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,3.0,3.0,3.0,1.0)
