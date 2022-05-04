@@ -13,8 +13,6 @@
 import random
 import sys
 import copy
-import random
-import copy
 import csv
 import matplotlib.pyplot as plt
 import pandas as pd
