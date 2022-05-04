@@ -113,7 +113,7 @@ class Particle:
         chromosome = Chromosome()
         min, max = search_space
         for _ in range(size):
-            chromosome.append(min + (random.random() * (max - min)))
+            chromosome.append(np.random.uniform(min, max))
         return chromosome
 
 
@@ -435,7 +435,7 @@ class Solver:
     def mutateGoodSolution(self, elite_solution, min, max):
         point = random.randint(0, len(elite_solution)-1)
         chromosome = elite_solution[:]
-        chromosome[point] = min + (random.random() * (max - min))
+        chromosome[point] = np.random.uniform(min, max)
         return chromosome
 
     # Crossover operator

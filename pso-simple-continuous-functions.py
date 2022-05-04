@@ -303,7 +303,7 @@ class Particle:
         solution = []
         min, max = search_space
         for _ in range(size):
-            solution.append(min + (random.random() * (max - min)))
+            solution.append(np.random.uniform(min, max))
         return solution
 
 
