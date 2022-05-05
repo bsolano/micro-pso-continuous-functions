@@ -325,7 +325,7 @@ if __name__ == "__main__":
         for i in range(30):
             results = []
             start_time = process_time()
-            pso = PSO(function, functions_search_space[function.__name__], iterations=105000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
+            pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
             pso.run()  # runs the PSO algorithm
             ms = (process_time() - start_time) * 1000.0
             results.append(function.__name__)

@@ -676,7 +676,7 @@ if __name__ == "__main__":
             for i in range(30):
                 results = []
                 start_time = process_time()
-                pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
+                pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=10,
                             beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
