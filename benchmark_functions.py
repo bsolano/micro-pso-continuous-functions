@@ -24,6 +24,24 @@ functions_search_space = {
     'dejong_f3': (-5.12,5.12),
     'dejong_f4': (-1.28,1.28),
     'dejong_f5': (-65.536,65.536),
+    'rosenbrock2': (-5,10),
+    'rosenbrock3': (-5,10),
+    'rosenbrock4': (-5,10),
+    'rosenbrock5': (-5,10),
+    'rosenbrock6': (-5,10),
+    'rosenbrock7': (-5,10),
+    'rosenbrock8': (-5,10),
+    'rosenbrock9': (-5,10),
+    'rosenbrock10': (-5,10),
+    'rosenbrock11': (-5,10),
+    'rosenbrock12': (-5,10),
+    'rosenbrock13': (-5,10),
+    'rosenbrock14': (-5,10),
+    'rosenbrock15': (-5,10),
+    'rosenbrock16': (-5,10),
+    'rosenbrock17': (-5,10),
+    'rosenbrock18': (-5,10),
+    'rosenbrock19': (-5,10),
     'rosenbrock20': (-5,10),
     'rastringin20': (-5.12,5.12),
     'griewank1': (-600,600),
@@ -63,6 +81,24 @@ functions_solution = {
     'dejong_f3': [-5.12,-5.12,-5.12,-5.12,-5.12],
     'dejong_f4': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
     'dejong_f5': [-32.0,-32.0],
+    'rosenbrock2': [1.0,1.0],
+    'rosenbrock3': [1.0,1.0,1.0],
+    'rosenbrock4': [1.0,1.0,1.0,1.0],
+    'rosenbrock5': [1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock6': [1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock7': [1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock8': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock9': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock10': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock11': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock12': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock13': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock14': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock15': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock16': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock17': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock18': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
+    'rosenbrock19': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
     'rosenbrock20': [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],
     'rastringin20': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
     'griewank1': [0.0],
@@ -192,6 +228,168 @@ def dejong_f5(x1, x2):
 
 
 # locals does not work with numba
+def rosenbrock2(x1, x2):
+    sum = 0.0
+    for i in range(1,2):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock3(x1, x2, x3):
+    sum = 0.0
+    for i in range(1,3):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock4(x1, x2, x3, x4):
+    sum = 0.0
+    for i in range(1,4):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock5(x1, x2, x3, x4, x5):
+    sum = 0.0
+    for i in range(1,5):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock6(x1, x2, x3, x4, x5, x6):
+    sum = 0.0
+    for i in range(1,6):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock7(x1, x2, x3, x4, x5, x6, x7):
+    sum = 0.0
+    for i in range(1,7):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock8(x1, x2, x3, x4, x5, x6, x7, x8):
+    sum = 0.0
+    for i in prange(1,8):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
+    sum = 0.0
+    for i in prange(1,9):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
+    sum = 0.0
+    for i in prange(1,10):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
+    sum = 0.0
+    for i in prange(1,11):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
+    sum = 0.0
+    for i in prange(1,12):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
+    sum = 0.0
+    for i in prange(1,13):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
+    sum = 0.0
+    for i in prange(1,14):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15):
+    sum = 0.0
+    for i in prange(1,15):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16):
+    sum = 0.0
+    for i in prange(1,16):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17):
+    sum = 0.0
+    for i in prange(1,17):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18):
+    sum = 0.0
+    for i in prange(1,18):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
+def rosenbrock19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19):
+    sum = 0.0
+    for i in prange(1,19):
+        x_iplus1 = locals()['x'+str(i+1)]
+        x_i = locals()['x'+str(i)]
+        sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
+    return sum
+
+
 def rosenbrock20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
     sum = 0.0
     for i in prange(1,20):
@@ -455,7 +653,6 @@ dejong_f2(1.0,1.0)
 dejong_f3(-5.12,-5.12,-5.12,-5.12,-5.12)
 dejong_f4(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 dejong_f5(-32.0,-32.0)
-rosenbrock20(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0)
 rastringin20(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 griewank1(0.0)
 griewank2(0.0,0.0)
