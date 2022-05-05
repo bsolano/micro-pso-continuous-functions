@@ -668,12 +668,12 @@ if __name__ == "__main__":
         writer.writerows(fileoutput)
         csvFile.close()
     else:
-        for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock20','rastringin20','griewank1','griewank2','griewank3','griewank4','griewank5','griewank6','griewank7','griewank8','griewank9','griewank10','griewank11','griewank12','griewank13','griewank14','griewank15','griewank16','griewank17','griewank18','griewank19','griewank20']:
+        for function_name in ['cross_in_tray']:#['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock20','rastringin20','griewank1','griewank2','griewank3','griewank4','griewank5','griewank6','griewank7','griewank8','griewank9','griewank10','griewank11','griewank12','griewank13','griewank14','griewank15','griewank16','griewank17','griewank18','griewank19','griewank20']:
             function = globals()[function_name]
             results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
-            for i in range(30):
+            for i in range(1):
                 results = []
                 start_time = process_time()
                 pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
@@ -681,7 +681,10 @@ if __name__ == "__main__":
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
                 results.append(function.__name__)
-                results += functions_solution[function.__name__]
+                if isinstance(functions_solution[function.__name__][0], list):
+                    results += functions_solution[function.__name__][0]
+                else:
+                    results += functions_solution[function.__name__]
                 results += pso.getGBest().getPBest()
                 if isinstance(functions_solution[function.__name__][0], list):
                     min = np.inf
@@ -694,13 +697,23 @@ if __name__ == "__main__":
                     euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
                 results.append(euclidean_distance)
                 results.append(1 if np.isclose(euclidean_distance, 0.0) else 0)
-                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
+                if isinstance(functions_solution[function.__name__][0], list):
+                    equal = 0
+                    for solution in functions_solution[function.__name__]:
+                        if np.allclose(pso.getGBest().getPBest(), solution):
+                            equal = 1
+                            break
+                    results.append(equal)
+                else:
+                    results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
                 results.append(pso.getGBest().getCostPBest())
                 if isinstance(functions_solution[function.__name__][0], list):
-                    sum = 0
+                    equal = 0
                     for solution in functions_solution[function.__name__]:
-                        sum += 1 if np.isclose(pso.getGBest().getCostPBest(), function(*solution)) else 0
-                    results.append(sum)
+                        if np.isclose(pso.getGBest().getCostPBest(), function(*solution)):
+                            equal = 1
+                            break
+                    results.append(equal)
                 else:
                     results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__])) else 0)
                 epoch = pso.getEpoch()
@@ -709,7 +722,7 @@ if __name__ == "__main__":
                 fileoutput.append(results)
 
             # pso-results.csv
-            csvFile = open('micro-pso-continuous-'+function_name+'.csv', 'w', newline='')
+            csvFile = open('results/micro-pso-continuous-'+function_name+'.csv', 'w', newline='')
             writer = csv.writer(csvFile)
             writer.writerows(fileoutput)
             csvFile.close()

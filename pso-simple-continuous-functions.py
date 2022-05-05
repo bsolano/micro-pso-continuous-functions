@@ -329,7 +329,10 @@ if __name__ == "__main__":
             pso.run()  # runs the PSO algorithm
             ms = (process_time() - start_time) * 1000.0
             results.append(function.__name__)
-            results += functions_solution[function.__name__]
+            if isinstance(functions_solution[function.__name__][0], list):
+                results += functions_solution[function.__name__][0]
+            else:
+                results += functions_solution[function.__name__]
             results += pso.getGBest().getPBest()
             if isinstance(functions_solution[function.__name__][0], list):
                 min = np.inf
@@ -342,13 +345,23 @@ if __name__ == "__main__":
                 euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
             results.append(euclidean_distance)
             results.append(1 if np.isclose(euclidean_distance, 0.0) else 0)
-            results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
+            if isinstance(functions_solution[function.__name__][0], list):
+                equal = 0
+                for solution in functions_solution[function.__name__]:
+                    if np.allclose(pso.getGBest().getPBest(), solution):
+                        equal = 1
+                        break
+                results.append(equal)
+            else:
+                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
             results.append(pso.getGBest().getCostPBest())
             if isinstance(functions_solution[function.__name__][0], list):
-                sum = 0
+                equal = 0
                 for solution in functions_solution[function.__name__]:
-                    sum += 1 if np.isclose(pso.getGBest().getCostPBest(), function(*solution)) else 0
-                results.append(sum)
+                    if np.isclose(pso.getGBest().getCostPBest(), function(*solution)):
+                        equal = 1
+                        break
+                results.append(equal)
             else:
                 results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__])) else 0)
             iteration = pso.getIter()
@@ -361,7 +374,7 @@ if __name__ == "__main__":
             print("gbest: ", pso.getGBest().getPBest())
             print("")
 
-        csvFile = open('pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')
+        csvFile = open('results/pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')
         with csvFile:
             writer = csv.writer(csvFile)
             writer.writerows(fileoutput)
