@@ -668,12 +668,12 @@ if __name__ == "__main__":
         writer.writerows(fileoutput)
         csvFile.close()
     else:
-        for function_name in ['cross_in_tray']:#['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock20','rastringin20','griewank1','griewank2','griewank3','griewank4','griewank5','griewank6','griewank7','griewank8','griewank9','griewank10','griewank11','griewank12','griewank13','griewank14','griewank15','griewank16','griewank17','griewank18','griewank19','griewank20']:
+        for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock20','rastringin20','griewank1','griewank2','griewank3','griewank4','griewank5','griewank6','griewank7','griewank8','griewank9','griewank10','griewank11','griewank12','griewank13','griewank14','griewank15','griewank16','griewank17','griewank18','griewank19','griewank20']:
             function = globals()[function_name]
             results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
-            for i in range(1):
+            for i in range(30):
                 results = []
                 start_time = process_time()
                 pso = Solver(function, functions_search_space[function.__name__], iterations=350, max_epochs=300, population_size=10,
