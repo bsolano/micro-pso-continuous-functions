@@ -1,5 +1,3 @@
-from numba import njit, prange
-
 from math import sin
 from math import cos
 from math import sqrt
@@ -125,42 +123,46 @@ functions_solution = {
 }
 
 
-@njit(cache=True)
 def beale(x1, x2, x3):
     return (1.5 - x1 + x1*x2)**2 + (2.25 - x1 + x1*x2**2)**2 + (2.625 - x1 + x1*x3**3)**2
 
 
-@njit(cache=True)
 def biggs_exp2(x1, x2):
     sum = 0
-    for i in prange(10):
+    for i in range(10):
         zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
-        sum += ((exp(-x1*zi) - 5*exp(-x2*zi)) - yi)**2
+        try:
+            sum += ((exp(-x1*zi) - 5*exp(-x2*zi)) - yi)**2
+        except OverflowError:
+            sum = inf
     return sum
 
 
-@njit(cache=True)
 def biggs_exp3(x1, x2, x3):
     sum = 0.0
-    for i in prange(10):
+    for i in range(10):
         zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
-        sum += ((exp(-x1*zi) - x3*exp(-x2*zi)) - yi)**2
+        try:
+            sum += ((exp(-x1*zi) - x3*exp(-x2*zi)) - yi)**2
+        except OverflowError:
+            sum = inf
     return sum
 
 
-@njit(cache=True)
 def biggs_exp4(x1, x2, x3, x4):
     sum = 0.0
-    for i in prange(10):
+    for i in range(10):
         zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi)
-        sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi)) - yi)**2
+        try:
+            sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi)) - yi)**2
+        except OverflowError:
+            sum = inf
     return sum
 
 
-# Numba has a bug and this function does not return a correct value with it
 def biggs_exp5(x1, x2, x3, x4, x5):
     sum = 0.0
     for i in range(12):
@@ -173,61 +175,54 @@ def biggs_exp5(x1, x2, x3, x4, x5):
     return sum
 
 
-@njit(cache=True)
 def biggs_exp6(x1, x2, x3, x4, x5, x6):
     sum = 0.0
-    for i in prange(13):
+    for i in range(13):
         zi = 0.1*(i+1)
         yi = exp(-zi) - 5*exp(-10*zi) + 3*exp(-4*zi)
-        sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + x6*exp(-x5*zi)) - yi)**2
+        try:
+            sum += ((x3*exp(-x1*zi) - x4*exp(-x2*zi) + x6*exp(-x5*zi)) - yi)**2
+        except OverflowError:
+            sum = inf
     return sum
 
 
-@njit(cache=True)
 def cross_in_tray(x1, x2):
     return -0.0001 * (fabs(sin(x1)*sin(x2) * exp(fabs(100-sqrt(x1*x1+x2*x2)/pi))) + 1)**0.1
 
 
-@njit(cache=True)
 def drop_in_wave(x1, x2):
     return -(1 + cos(12*sqrt(x1*x1+x2*x2))) / (0.5*(x1*x1+x2*x2) + 2)
 
 
-@njit(cache=True)
 def dejong_f1(x1, x2, x3):
     return x1**2 + x2**2 + x3**2
 
 
-@njit(cache=True)
 def dejong_f2(x1, x2):
     return 100 * (x2-x1**2)**2 + (1-x1)**2
 
 
-@njit(cache=True)
 def dejong_f3(x1, x2, x3, x4, x5):
     return floor(x1) + floor(x2) + floor(x3) + floor(x4) + floor(x5)
 
 
-@njit(cache=True)
 def dejong_f4(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30):
     return 1 * x1**4 + 2 * x2**4 + 3 * x3**4 + 4 * x4**4 + 5 * x5**4 + 6 * x6**4 + 7 * x7**4 + 8 * x8**4 + 9 * x9**4 + 10 * x10**4 + 11 * x11**4 + 12 * x12**4 + 13 * x13**4 + 4 * x14**14 + 15 * x15**4 + 16 * x16**4 + 17 * x17**4 + 18 * x18**4 + 19 * x19**4 + 20 * x20**4 + 21 * x21**4 + 22 * x22**4 + 23 * x23**4 + 24 * x24**4 + 25 * x25**4 + 26 * x26**4 + 27 * x27**4 + 28 * x28**4 + 29 * x29**4 + 30 * x30**4
 
 
-@njit(cache=True)
 def f(j, x1, x2):
     a = [[-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32],[-32,-32,-32,-32,-32,-16,-16,-16,-16,-16,0,0,0,0,0,16,16,16,16,16,32,32,32,32,32]]
     return j + (x1-a[0][j-1])**6 + (x2-a[1][j-1])**6
 
 
-@njit(cache=True)
 def dejong_f5(x1, x2):
     sum = 0.0
-    for j in prange(1,26):
+    for j in range(1,26):
         sum += 1/f(j,x1,x2)
     return 1 / (0.002 + sum)
 
 
-# locals does not work with numba
 def rosenbrock2(x1, x2):
     sum = 0.0
     for i in range(1,2):
@@ -284,7 +279,7 @@ def rosenbrock7(x1, x2, x3, x4, x5, x6, x7):
 
 def rosenbrock8(x1, x2, x3, x4, x5, x6, x7, x8):
     sum = 0.0
-    for i in prange(1,8):
+    for i in range(1,8):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -293,7 +288,7 @@ def rosenbrock8(x1, x2, x3, x4, x5, x6, x7, x8):
 
 def rosenbrock9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
     sum = 0.0
-    for i in prange(1,9):
+    for i in range(1,9):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -302,7 +297,7 @@ def rosenbrock9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
 
 def rosenbrock10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
     sum = 0.0
-    for i in prange(1,10):
+    for i in range(1,10):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -311,7 +306,7 @@ def rosenbrock10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
 
 def rosenbrock11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
     sum = 0.0
-    for i in prange(1,11):
+    for i in range(1,11):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -320,7 +315,7 @@ def rosenbrock11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
 
 def rosenbrock12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
     sum = 0.0
-    for i in prange(1,12):
+    for i in range(1,12):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -329,7 +324,7 @@ def rosenbrock12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
 
 def rosenbrock13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     sum = 0.0
-    for i in prange(1,13):
+    for i in range(1,13):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -338,7 +333,7 @@ def rosenbrock13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
 
 def rosenbrock14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
     sum = 0.0
-    for i in prange(1,14):
+    for i in range(1,14):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -347,7 +342,7 @@ def rosenbrock14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
 
 def rosenbrock15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15):
     sum = 0.0
-    for i in prange(1,15):
+    for i in range(1,15):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -356,7 +351,7 @@ def rosenbrock15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 def rosenbrock16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16):
     sum = 0.0
-    for i in prange(1,16):
+    for i in range(1,16):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -365,7 +360,7 @@ def rosenbrock16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 def rosenbrock17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17):
     sum = 0.0
-    for i in prange(1,17):
+    for i in range(1,17):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -374,7 +369,7 @@ def rosenbrock17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 def rosenbrock18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18):
     sum = 0.0
-    for i in prange(1,18):
+    for i in range(1,18):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -383,7 +378,7 @@ def rosenbrock18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 def rosenbrock19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19):
     sum = 0.0
-    for i in prange(1,19):
+    for i in range(1,19):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
@@ -392,14 +387,13 @@ def rosenbrock19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
 
 def rosenbrock20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
     sum = 0.0
-    for i in prange(1,20):
+    for i in range(1,20):
         x_iplus1 = locals()['x'+str(i+1)]
         x_i = locals()['x'+str(i)]
         sum += 100*(x_iplus1-x_i**2)**2+(x_i-1)**2
     return sum
 
 
-@njit(cache=True)
 def rastringin20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
     sum = 0.0
     for x_i in (x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
@@ -407,12 +401,10 @@ def rastringin20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x1
     return sum
 
 
-@njit(cache=True)
 def griewank1(x1):
     return x1**2/4000 - cos(x1 / sqrt(1)) + 1
 
 
-@njit(cache=True)
 def griewank2(x1, x2):
     sum = 0.0
     mul = 1.0
@@ -422,7 +414,6 @@ def griewank2(x1, x2):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank3(x1, x2, x3):
     sum = 0.0
     mul = 1.0
@@ -432,7 +423,6 @@ def griewank3(x1, x2, x3):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank4(x1, x2, x3, x4):
     sum = 0.0
     mul = 1.0
@@ -442,7 +432,6 @@ def griewank4(x1, x2, x3, x4):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank5(x1, x2, x3, x4, x5):
     sum = 0.0
     mul = 1.0
@@ -452,7 +441,6 @@ def griewank5(x1, x2, x3, x4, x5):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank6(x1, x2, x3, x4, x5, x6):
     sum = 0.0
     mul = 1.0
@@ -462,7 +450,6 @@ def griewank6(x1, x2, x3, x4, x5, x6):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank7(x1, x2, x3, x4, x5, x6, x7):
     sum = 0.0
     mul = 1.0
@@ -472,7 +459,6 @@ def griewank7(x1, x2, x3, x4, x5, x6, x7):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank8(x1, x2, x3, x4, x5, x6, x7, x8):
     sum = 0.0
     mul = 1.0
@@ -482,7 +468,6 @@ def griewank8(x1, x2, x3, x4, x5, x6, x7, x8):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
     sum = 0.0
     mul = 1.0
@@ -492,7 +477,6 @@ def griewank9(x1, x2, x3, x4, x5, x6, x7, x8, x9):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
     sum = 0.0
     mul = 1.0
@@ -502,7 +486,6 @@ def griewank10(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
     sum = 0.0
     mul = 1.0
@@ -512,7 +495,6 @@ def griewank11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
     sum = 0.0
     mul = 1.0
@@ -522,7 +504,6 @@ def griewank12(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     sum = 0.0
     mul = 1.0
@@ -532,7 +513,6 @@ def griewank13(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
     sum = 0.0
     mul = 1.0
@@ -542,7 +522,6 @@ def griewank14(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14):
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15):
     sum = 0.0
     mul = 1.0
@@ -552,7 +531,6 @@ def griewank15(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15)
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16):
     sum = 0.0
     mul = 1.0
@@ -562,7 +540,6 @@ def griewank16(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17):
     sum = 0.0
     mul = 1.0
@@ -572,7 +549,6 @@ def griewank17(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18):
     sum = 0.0
     mul = 1.0
@@ -582,7 +558,6 @@ def griewank18(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19):
     sum = 0.0
     mul = 1.0
@@ -592,7 +567,6 @@ def griewank19(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def griewank20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20):
     sum = 0.0
     mul = 1.0
@@ -602,7 +576,6 @@ def griewank20(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15,
     return sum/4000 - mul + 1
 
 
-@njit(cache=True)
 def karaboga_akay(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     sum1 = 0.0
     for x_i in (x1, x2, x3, x4):
@@ -639,7 +612,7 @@ def karaboga_akay(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13):
     else:
         return sum
 
-# For pre-caching:
+# For testing:
 beale(3,0.5,0.5)
 biggs_exp2(1.0,10.0)
 biggs_exp3(1.0,10.0,5.0)
