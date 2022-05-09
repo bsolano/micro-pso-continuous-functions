@@ -307,7 +307,6 @@ class Solver:
                 for particle in self.particles:
                     previousCost = particle.getCurrentSolutionCost()
 
-                    particle.clearVelocity()  # cleans the speed of the particle
                     # gets solution of the gbest solution
                     gbest = list(self.gbest.getPBest())
 
@@ -320,6 +319,13 @@ class Solver:
                     elif self.mutation_type == 'mutateGoodSolutionMuSigma':
                         bestNeighbor = getattr(self, self.mutation_type)(
                             particle.getCurrentSolution(), self.mu, self.sigma)
+
+                    for i in range(len(bestNeighbor)):
+                        if bestNeighbor[i] < self.search_space[0]:
+                            bestNeighbor[i] = self.search_space[0]
+                        if bestNeighbor[i] > self.search_space[1]:
+                            bestNeighbor[i] = self.search_space[1]
+
                     bestNeighborCost = self.cost_function(*bestNeighbor)
 
                     newSolution = particle.getCurrentSolution()[:]
@@ -346,6 +352,12 @@ class Solver:
                         elif self.crossover_type == 'crossover':
                             newSolution = getattr(self, self.crossover_type)(
                                 list(newSolution), dissimilar_particle.getPBest(), gamma=self.gamma)
+
+                    for i in range(len(newSolution)):
+                        if newSolution[i] < self.search_space[0]:
+                            newSolution[i] = self.search_space[0]
+                        if newSolution[i] > self.search_space[1]:
+                            newSolution[i] = self.search_space[1]
 
                         # gets cost of the current solution
                     newSolutionCost = self.cost_function(*newSolution)
