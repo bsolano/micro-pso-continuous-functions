@@ -344,26 +344,26 @@ if __name__ == "__main__":
             else:
                 euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
             results.append(euclidean_distance)
-            results.append(1 if np.isclose(euclidean_distance, 0.0) else 0)
+            results.append(1 if np.isclose(euclidean_distance, 0.0, atol=1e-06) else 0)
             if isinstance(functions_solution[function.__name__][0], list):
                 equal = 0
                 for solution in functions_solution[function.__name__]:
-                    if np.allclose(pso.getGBest().getPBest(), solution):
+                    if np.allclose(pso.getGBest().getPBest(), solution, atol=1e-06):
                         equal = 1
                         break
                 results.append(equal)
             else:
-                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__]) else 0)
+                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__], atol=1e-06) else 0)
             results.append(pso.getGBest().getCostPBest())
             if isinstance(functions_solution[function.__name__][0], list):
                 equal = 0
                 for solution in functions_solution[function.__name__]:
-                    if np.isclose(pso.getGBest().getCostPBest(), function(*solution)):
+                    if np.isclose(pso.getGBest().getCostPBest(), function(*solution), atol=1e-06):
                         equal = 1
                         break
                 results.append(equal)
             else:
-                results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__])) else 0)
+                results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-06) else 0)
             iteration = pso.getIter()
             results.append(ms)
             results.append(iteration)
