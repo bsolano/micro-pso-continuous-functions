@@ -480,9 +480,7 @@ class Chromosome(list):
 
 if __name__ == "__main__":
 
-    # creates a PSO instance
-    # beta is the probability for a global best movement
-    run_experiment = False
+    run_experiment = True
     if run_experiment == True:
         function_name = 'griewank20'
         function = globals()[function_name]
@@ -555,6 +553,8 @@ if __name__ == "__main__":
             results = parameters
             exact_results = 0
             for i in range(20):
+                # creates a PSO instance
+                # beta is the probability for a global best movement
                 pso = Solver(function, functions_search_space[function.__name__], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(
                     50 + (parameters[2] * (300 - 50))), crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=parameters[3], sigma=parameters[4], gamma=parameters[5])
                 pso.run()  # runs the PSO algorithm
