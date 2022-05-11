@@ -362,7 +362,7 @@ if __name__ == "__main__":
                 pso.run()  # runs the PSO algorithm
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
-                exact_results += (1 if np.isclose(pso.getGBest().getCostPBest(), function(functions_solution[function.__name__]), atol=1e-05) else 0)
+                exact_results += (1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-05) else 0)
                 mean_cost += cost
                 mean_iterations += pso.getIter()
             mean_cost /= 20.0
