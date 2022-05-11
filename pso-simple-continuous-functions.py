@@ -314,7 +314,7 @@ class Chromosome(list):
 
 
 if __name__ == "__main__":
-    run_experiment = False
+    run_experiment = True
     if run_experiment == True:
         function_name = 'griewank20'
         function = globals()[function_name]
