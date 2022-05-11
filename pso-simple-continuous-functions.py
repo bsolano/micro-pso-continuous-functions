@@ -320,7 +320,7 @@ if __name__ == "__main__":
         function = globals()[function_name]
         fileoutput = []
         results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
-                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results']
+                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean iterations']
         fileoutput.append(results)
         parameters_space = [[0.32599834,0.58390435,0.38663557],
                             [0.4084812, 0.21552659,0.44582005],
@@ -356,17 +356,20 @@ if __name__ == "__main__":
             mean_cost = 0
             results = parameters
             exact_results = 0
+            mean_iterations = 0
             for i in range(20):
                 pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=parameters[0], particle_confidence=parameters[1]*2, swarm_confidence=parameters[2]*2)
                 pso.run()  # runs the PSO algorithm
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
-                exact_results += (1 if np.allclose(pso.getGBest().getPBest(),
-                                  functions_solution[function.__name__], atol=1e-05) else 0)
+                exact_results += (1 if np.isclose(pso.getGBest().getCostPBest(), function(functions_solution[function.__name__]), atol=1e-05) else 0)
                 mean_cost += cost
+                mean_iterations += pso.getIter()
             mean_cost /= 20.0
+            mean_iterations /= 20.0
             results.append(mean_cost)
             results.append(exact_results)
+            results.append(mean_iterations)
             fileoutput.append(results)
 
         # pso-results.csv

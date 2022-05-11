@@ -486,7 +486,7 @@ if __name__ == "__main__":
         function = globals()[function_name]
         fileoutput = []
         results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
-                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results']
+                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs']
         fileoutput.append(results)
         parameters_space = [[0.48879283,0.3983071, 0.92941838,0.85038197,0.56528412,0.79814386],
                             [0.41221565,0.88644535,0.10703765,0.21039606,0.16987125,0.95126699],
@@ -552,6 +552,7 @@ if __name__ == "__main__":
             mean_cost = 0
             results = parameters
             exact_results = 0
+            mean_epochs = 0
             for i in range(20):
                 # creates a PSO instance
                 # beta is the probability for a global best movement
@@ -560,12 +561,14 @@ if __name__ == "__main__":
                 pso.run()  # runs the PSO algorithm
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
-                exact_results += (1 if np.allclose(pso.getGBest().getPBest(),
-                                  functions_solution[function.__name__], atol=1e-05) else 0)
+                exact_results += (1 if np.isclose(pso.getGBest().getCostPBest(), function(functions_solution[function.__name__]), atol=1e-05) else 0)
                 mean_cost += cost
+                mean_epochs += pso.getEpoch()
             mean_cost /= 20.0
+            mean_epochs /= 20.0
             results.append(mean_cost)
             results.append(exact_results)
+            results.append(mean_epochs)
             fileoutput.append(results)
 
         # pso-results.csv
