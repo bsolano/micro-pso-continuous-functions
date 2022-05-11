@@ -314,68 +314,129 @@ class Chromosome(list):
 
 
 if __name__ == "__main__":
-    # creates a PSO instance
-    # alfa is the probabiliy for a movement based on local best
-    # beta is the probability for a movement based on the global best
-    for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock2','rosenbrock3','rosenbrock4','rosenbrock5','rosenbrock6','rosenbrock7','rosenbrock8','rosenbrock9','rosenbrock10','rosenbrock11','rosenbrock12','rosenbrock13','rosenbrock14','rosenbrock15','rosenbrock16','rosenbrock17','rosenbrock18','rosenbrock19','rosenbrock20','rastringin20','griewank20']:
+    run_experiment = False
+    if run_experiment == True:
+        function_name = 'griewank20'
         function = globals()[function_name]
-        results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Iterations']
         fileoutput = []
+        results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
+                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results']
         fileoutput.append(results)
-        for i in range(30):
-            results = []
-            start_time = process_time()
-            pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
-            pso.run()  # runs the PSO algorithm
-            ms = (process_time() - start_time) * 1000.0
-            results.append(function.__name__)
-            if isinstance(functions_solution[function.__name__][0], list):
-                results += functions_solution[function.__name__][0]
-            else:
-                results += functions_solution[function.__name__]
-            results += pso.getGBest().getPBest()
-            if isinstance(functions_solution[function.__name__][0], list):
-                min = np.inf
-                for solution in functions_solution[function.__name__]:
-                    euclidean_distance = euclidean(pso.getGBest().getPBest(), solution)
-                    if euclidean_distance < min:
-                        min = euclidean_distance
-                euclidean_distance = min
-            else:
-                euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
-            results.append(euclidean_distance)
-            results.append(1 if np.isclose(euclidean_distance, 0.0, atol=1e-05) else 0)
-            if isinstance(functions_solution[function.__name__][0], list):
-                equal = 0
-                for solution in functions_solution[function.__name__]:
-                    if np.allclose(pso.getGBest().getPBest(), solution, atol=1e-05):
-                        equal = 1
-                        break
-                results.append(equal)
-            else:
-                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__], atol=1e-05) else 0)
-            results.append(pso.getGBest().getCostPBest())
-            if isinstance(functions_solution[function.__name__][0], list):
-                equal = 0
-                for solution in functions_solution[function.__name__]:
-                    if np.isclose(pso.getGBest().getCostPBest(), function(*solution), atol=1e-05):
-                        equal = 1
-                        break
-                results.append(equal)
-            else:
-                results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-05) else 0)
-            iteration = pso.getIter()
-            results.append(ms)
-            results.append(iteration)
+        parameters_space = [[0.32599834,0.58390435,0.38663557],
+                            [0.4084812, 0.21552659,0.44582005],
+                            [0.61287535,0.80721435,0.86494361],
+                            [0.90019089,0.49630546,0.62210536],
+                            [0.14872141,0.95555133,0.74617944],
+                            [0.54476689,0.8963839, 0.7126064 ],
+                            [0.27083494,0.12333146,0.36372988],
+                            [0.99062972,0.0228287, 0.5202993 ],
+                            [0.87495921,0.69689851,0.97154622],
+                            [0.59081831,0.75287642,0.33149702],
+                            [0.94704042,0.36961533,0.0187701 ],
+                            [0.34066728,0.27372489,0.10044892],
+                            [0.69699748,0.4202998, 0.2330681 ],
+                            [0.20669621,0.99944323,0.25770852],
+                            [0.74229077,0.08474781,0.77256829],
+                            [0.64635665,0.18251727,0.81957571],
+                            [0.52558646,0.45300364,0.91947666],
+                            [0.77888261,0.34014897,0.66176684],
+                            [0.12380011,0.25430048,0.03471743],
+                            [0.72790392,0.52548816,0.67756385],
+                            [0.02695453,0.55795663,0.16995784],
+                            [0.05730227,0.65325683,0.09487899],
+                            [0.48433257,0.03648114,0.55846327],
+                            [0.82065159,0.85632715,0.29842505],
+                            [0.18866629,0.90474284,0.96349276],
+                            [0.38771973,0.13965407,0.42237655],
+                            [0.07707235,0.7029901, 0.57500681],
+                            [0.84833275,0.30416365,0.145066  ],
+                            [0.43595953,0.77202635,0.88460923],
+                            [0.25363902,0.61728326,0.48900878]]
+        for parameters in parameters_space:
+            mean_cost = 0
+            results = parameters
+            exact_results = 0
+            for i in range(20):
+                pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=parameters[0], particle_confidence=parameters[2], swarm_confidence=parameters[3])
+                pso.run()  # runs the PSO algorithm
+                cost = pso.getGBest().getCostPBest()
+                results.append(cost)
+                exact_results += (1 if np.allclose(pso.getGBest().getPBest(),
+                                  functions_solution[function.__name__], atol=1e-05) else 0)
+                mean_cost += cost
+            mean_cost /= 20.0
+            results.append(mean_cost)
+            results.append(exact_results)
             fileoutput.append(results)
-            # shows the global best particle
-            print("Cost of gbest: ", "{:.20f}".format(
-                pso.getGBest().getCostPBest()))
-            print("gbest: ", pso.getGBest().getPBest())
-            print("")
 
-        csvFile = open('results/pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')
-        with csvFile:
-            writer = csv.writer(csvFile)
-            writer.writerows(fileoutput)
+        # pso-results.csv
+        csvFile = open('results/micro-pso-continuous-griewank20-experiment.csv', 'w', newline='')
+        writer = csv.writer(csvFile)
+        writer.writerows(fileoutput)
         csvFile.close()
+    else:
+        # creates a PSO instance
+        # alfa is the probabiliy for a movement based on local best
+        # beta is the probability for a movement based on the global best
+        for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock2','rosenbrock3','rosenbrock4','rosenbrock5','rosenbrock6','rosenbrock7','rosenbrock8','rosenbrock9','rosenbrock10','rosenbrock11','rosenbrock12','rosenbrock13','rosenbrock14','rosenbrock15','rosenbrock16','rosenbrock17','rosenbrock18','rosenbrock19','rosenbrock20','rastringin20','griewank20']:
+            function = globals()[function_name]
+            results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Iterations']
+            fileoutput = []
+            fileoutput.append(results)
+            for i in range(30):
+                results = []
+                start_time = process_time()
+                pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=0.8, particle_confidence=1, swarm_confidence=2)
+                pso.run()  # runs the PSO algorithm
+                ms = (process_time() - start_time) * 1000.0
+                results.append(function.__name__)
+                if isinstance(functions_solution[function.__name__][0], list):
+                    results += functions_solution[function.__name__][0]
+                else:
+                    results += functions_solution[function.__name__]
+                results += pso.getGBest().getPBest()
+                if isinstance(functions_solution[function.__name__][0], list):
+                    min = np.inf
+                    for solution in functions_solution[function.__name__]:
+                        euclidean_distance = euclidean(pso.getGBest().getPBest(), solution)
+                        if euclidean_distance < min:
+                            min = euclidean_distance
+                    euclidean_distance = min
+                else:
+                    euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
+                results.append(euclidean_distance)
+                results.append(1 if np.isclose(euclidean_distance, 0.0, atol=1e-05) else 0)
+                if isinstance(functions_solution[function.__name__][0], list):
+                    equal = 0
+                    for solution in functions_solution[function.__name__]:
+                        if np.allclose(pso.getGBest().getPBest(), solution, atol=1e-05):
+                            equal = 1
+                            break
+                    results.append(equal)
+                else:
+                    results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__], atol=1e-05) else 0)
+                results.append(pso.getGBest().getCostPBest())
+                if isinstance(functions_solution[function.__name__][0], list):
+                    equal = 0
+                    for solution in functions_solution[function.__name__]:
+                        if np.isclose(pso.getGBest().getCostPBest(), function(*solution), atol=1e-05):
+                            equal = 1
+                            break
+                    results.append(equal)
+                else:
+                    results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-05) else 0)
+                iteration = pso.getIter()
+                results.append(ms)
+                results.append(iteration)
+                fileoutput.append(results)
+                # shows the global best particle
+                print("Cost of gbest: ", "{:.20f}".format(
+                    pso.getGBest().getCostPBest()))
+                print("gbest: ", pso.getGBest().getPBest())
+                print("")
+
+            csvFile = open('results/pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')
+            with csvFile:
+                writer = csv.writer(csvFile)
+                writer.writerows(fileoutput)
+            csvFile.close()
