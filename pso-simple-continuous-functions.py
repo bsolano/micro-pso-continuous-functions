@@ -357,7 +357,7 @@ if __name__ == "__main__":
             results = parameters
             exact_results = 0
             for i in range(20):
-                pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=parameters[0], particle_confidence=parameters[2], swarm_confidence=parameters[3])
+                pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=parameters[0], particle_confidence=parameters[1]*2, swarm_confidence=parameters[2]*2)
                 pso.run()  # runs the PSO algorithm
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
