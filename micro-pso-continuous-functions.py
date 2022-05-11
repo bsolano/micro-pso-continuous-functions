@@ -10,6 +10,7 @@
 # Date: June 6, 2018. April-May 2022
 ####################################################################################
 
+from cmath import log
 import random
 import sys
 import copy
@@ -265,6 +266,44 @@ class Solver:
     def getCurrentSolutions(self):
         return [particle.getCurrentSolution() for particle in self.particles]
 
+    def mutation_probability(self, initial_probability=0.1, current_epoch=0, max_epochs=1000):
+        alpha = max_epochs/log(initial_probability/10e-03)
+        return initial_probability * exp(-current_epoch/alpha)
+
+    # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
+    def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.1, sigma=0.1):
+        chromosome = [elite_solution[i]+sigma*random.random() if random.random()
+                      <= mu else elite_solution[i] for i in range(len(elite_solution))]
+        return chromosome
+
+    # mutates a randomly selected gene
+    def mutateGoodSolution(self, elite_solution, min, max):
+        point = random.randint(0, len(elite_solution)-1)
+        chromosome = elite_solution[:]
+        chromosome[point] = np.random.uniform(min, max)
+        return chromosome
+
+    # Crossover operator
+    def crossover(self, dadChromosome, momChromosome, gamma=0.1):
+        alpha = [random.uniform(-gamma, 1+gamma)
+                 for _ in range(len(dadChromosome))]
+        sonChromosome = [alpha[i]*dadChromosome[i] +
+                         (1-alpha[i])*momChromosome[i] for i in range(len(dadChromosome))]
+        daugtherChromosome = [alpha[i]*momChromosome[i] +
+                              (1-alpha[i])*dadChromosome[i] for i in range(len(dadChromosome))]
+        return sonChromosome
+
+    def average_crossover(self, dadChromosome, momChromosome):
+        """Average crossover mentioned in:
+        Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74"""
+        sonChromosome = list()
+        point1 = random.randint(0, len(dadChromosome)-1)
+        for i in range(0, point1+1):
+            sonChromosome.append(dadChromosome[i])
+        for i in range(point1+1, len(dadChromosome)):
+            sonChromosome.append((momChromosome[i]+dadChromosome[i])/2)
+        return sonChromosome
+
     def run(self):
         # variables for convergence data
         convergenceData = []
@@ -436,40 +475,6 @@ class Solver:
             plt.ylabel("Best cost")
             plt.plot(df['Epoch'], df['Best cost'])
             # plt.show()
-
-    # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
-    def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.1, sigma=0.1):
-        chromosome = [elite_solution[i]+sigma*random.random() if random.random()
-                      <= mu else elite_solution[i] for i in range(len(elite_solution))]
-        return chromosome
-
-    # mutates a randomly selected gene
-    def mutateGoodSolution(self, elite_solution, min, max):
-        point = random.randint(0, len(elite_solution)-1)
-        chromosome = elite_solution[:]
-        chromosome[point] = np.random.uniform(min, max)
-        return chromosome
-
-    # Crossover operator
-    def crossover(self, dadChromosome, momChromosome, gamma=0.1):
-        alpha = [random.uniform(-gamma, 1+gamma)
-                 for _ in range(len(dadChromosome))]
-        sonChromosome = [alpha[i]*dadChromosome[i] +
-                         (1-alpha[i])*momChromosome[i] for i in range(len(dadChromosome))]
-        daugtherChromosome = [alpha[i]*momChromosome[i] +
-                              (1-alpha[i])*dadChromosome[i] for i in range(len(dadChromosome))]
-        return sonChromosome
-
-    def average_crossover(self, dadChromosome, momChromosome):
-        """Average crossover mentioned in:
-        Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74"""
-        sonChromosome = list()
-        point1 = random.randint(0, len(dadChromosome)-1)
-        for i in range(0, point1+1):
-            sonChromosome.append(dadChromosome[i])
-        for i in range(point1+1, len(dadChromosome)):
-            sonChromosome.append((momChromosome[i]+dadChromosome[i])/2)
-        return sonChromosome
 
 
 # Define Chromosome as a subclass of list
