@@ -485,8 +485,7 @@ if __name__ == "__main__":
         function_name = 'griewank20'
         function = globals()[function_name]
         fileoutput = []
-        results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
-                   'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs']
+        results = ['Beta', 'Alfa', 'Iterations', 'Mu', 'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs', 'Mean time']
         fileoutput.append(results)
         parameters_space = [[0.48879283,0.3983071, 0.92941838,0.85038197,0.56528412,0.79814386],
                             [0.41221565,0.88644535,0.10703765,0.21039606,0.16987125,0.95126699],
@@ -553,12 +552,16 @@ if __name__ == "__main__":
             results = parameters
             exact_results = 0
             mean_epochs = 0
+            mean_time = 0
             for i in range(20):
                 # creates a PSO instance
                 # beta is the probability for a global best movement
+                start_time = process_time()
                 pso = Solver(function, functions_search_space[function.__name__], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(
                     50 + (parameters[2] * (300 - 50))), crossover_type='crossover', mutation_type='mutateGoodSolutionMuSigma', mu=parameters[3], sigma=parameters[4], gamma=parameters[5])
                 pso.run()  # runs the PSO algorithm
+                ms = (process_time() - start_time) * 1000.0
+                mean_time += ms
                 cost = pso.getGBest().getCostPBest()
                 results.append(cost)
                 exact_results += (1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-05) else 0)
@@ -566,9 +569,11 @@ if __name__ == "__main__":
                 mean_epochs += pso.getEpoch()
             mean_cost /= 20.0
             mean_epochs /= 20.0
+            mean_time /= 20.0
             results.append(mean_cost)
             results.append(exact_results)
             results.append(mean_epochs)
+            results.append(mean_time)
             fileoutput.append(results)
 
         # pso-results.csv
