@@ -319,7 +319,7 @@ class Solver:
                             particle.getCurrentSolution(), *self.search_space)
                     elif self.mutation_type == 'mutateGoodSolutionMuSigma':
                         bestNeighbor = getattr(self, self.mutation_type)(
-                            particle.getCurrentSolution(), self.mu, self.sigma)
+                            particle.getCurrentSolution(), self.mutation_probability(self.mu, epoch, self.max_epochs), self.sigma)
 
                     for i in range(len(bestNeighbor)):
                         if bestNeighbor[i] < self.search_space[0]:
