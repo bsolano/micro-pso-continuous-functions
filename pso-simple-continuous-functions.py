@@ -378,7 +378,7 @@ if __name__ == "__main__":
             fileoutput.append(results)
 
         # pso-results.csv
-        csvFile = open('results/pso-simple-continuous-griewank20-experiment.csv', 'w', newline='')
+        csvFile = open('results/pso-simple-continuous-rosenbrock8-experiment.csv', 'w', newline='')
         writer = csv.writer(csvFile)
         writer.writerows(fileoutput)
         csvFile.close()

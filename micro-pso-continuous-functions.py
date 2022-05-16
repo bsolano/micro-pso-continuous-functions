@@ -582,7 +582,7 @@ if __name__ == "__main__":
             fileoutput.append(results)
 
         # pso-results.csv
-        csvFile = open('results/micro-pso-continuous-griewank20-experiment.csv', 'w', newline='')
+        csvFile = open('results/micro-pso-continuous-rosenbrock8-experiment.csv', 'w', newline='')
         writer = csv.writer(csvFile)
         writer.writerows(fileoutput)
         csvFile.close()
