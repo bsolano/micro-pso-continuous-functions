@@ -21,6 +21,7 @@ from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
 from math import isclose
+from math import log
 from time import process_time
 import numpy as np
 
@@ -437,6 +438,10 @@ class Solver:
             plt.plot(df['Epoch'], df['Best cost'])
             # plt.show()
 
+    def mutation_probability(self, initial_probability=0.1, current_epoch=0, max_epochs=1000):
+        alpha = max_epochs/log(initial_probability/10e-03)
+        return initial_probability * exp(-current_epoch/alpha)
+        
     # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
     def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.1, sigma=0.1):
         chromosome = [elite_solution[i]+sigma*random.random() if random.random()
