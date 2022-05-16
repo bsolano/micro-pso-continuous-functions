@@ -482,7 +482,7 @@ if __name__ == "__main__":
 
     run_experiment = True
     if run_experiment == True:
-        function_name = 'griewank20'
+        function_name = 'rosenbrock8'
         function = globals()[function_name]
         fileoutput = []
         results = ['Beta', 'Alfa', 'Iterations', 'Mu', 'Sigma', 'Gamma'] + ['run'+str(i+1) for i in range(20)] + ['Mean', 'Exact results', 'Mean epochs', 'Mean time']
