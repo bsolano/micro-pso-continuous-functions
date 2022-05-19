@@ -270,6 +270,10 @@ class Solver:
         alpha = max_epochs/log(initial_probability/10e-03)
         return initial_probability * exp(-current_epoch/alpha)
 
+    def neighborhood_size(self, initial_size, current_epoch=0, max_epochs=1000):
+        alpha = max_epochs/log(initial_size/10e-02)
+        return initial_size * exp(-current_epoch/alpha)
+
     # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
     def mutateGoodSolutionMuSigma(self, elite_solution, mu=0.1, sigma=0.1):
         chromosome = [elite_solution[i]+sigma*random.random() if random.random()
