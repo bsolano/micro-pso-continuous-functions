@@ -347,8 +347,9 @@ class MicroEPSO:
                 self.init_population(self.population_size)
                 print("Particles: ", len(self.particles))
                 mutated_elite = getattr(self, self.mutation_type)(self.__global_best.best_particle, *self.search_space)
-                self.particles[random.randint(0, self.population_size-1)] = Particle(mutated_elite, self.__global_best.best_particle_cost)
-                print("Inserted elite solution!")
+                position = random.randint(0, self.population_size-1)
+                self.particles[position] = Particle(mutated_elite, self.__global_best.best_particle_cost)
+                print("Inserted elite solution in position", position)
 
             # for each time step (iteration)
             for t in range(self.iterations):
