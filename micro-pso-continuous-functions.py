@@ -154,7 +154,7 @@ class MicroEPSO:
         # Select the best random population among 5 populations
         bestSolutions = list(solutions)
 
-        if population_criteria == 'average_cost':
+        if self.__population_criteria == 'average_cost':
             bestCost = self.evaluate_solutions_average_cost(solutions)
 
             for _ in range(5):
@@ -166,15 +166,13 @@ class MicroEPSO:
                     bestSolutions = list(solutions)
                 del solutions[:]
 
-        elif population_criteria == 'diversity':
+        elif self.__population_criteria == 'diversity':
             mostDiverse = self.evaluate_solutions_diversity(solutions)
 
             for _ in range(5):
                 solutions = Particle.random_solutions(
                     self.nvars, self.search_space, self.population_size)
                 sim = self.evaluate_solutions_diversity(solutions)
-                print("Diversity of the population: ", sim)
-                #cost = self.evaluateSolutionsAverageCost(solutions)
                 if sim > mostDiverse:
                     mostDiverse = sim
                     bestSolutions = list(solutions)
