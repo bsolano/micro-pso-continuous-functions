@@ -121,7 +121,7 @@ class Particle:
 # MicroEPSO algorithm
 class MicroEPSO:
 
-    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, first_population_criteria: str='average_cost', crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
+    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, population_criteria: str='average_cost', crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
         self.cost_function = cost_function  # the cost function
         # number of variables in the cost function
         self.nvars = len(signature(cost_function).parameters)
@@ -134,6 +134,7 @@ class MicroEPSO:
         self.beta = beta
         # the probability that all swap operators in swap sequence (pbest - x(t-1))
         self.alfa = alfa
+        self.__population_criteria = population_criteria
         self.__last_epoch = 0
         self.crossover_type = crossover_type
         self.mutation_type = mutation_type
@@ -153,7 +154,7 @@ class MicroEPSO:
         # Select the best random population among 5 populations
         bestSolutions = list(solutions)
 
-        if first_population_criteria == 'average_cost':
+        if population_criteria == 'average_cost':
             bestCost = self.evaluate_solutions_average_cost(solutions)
 
             for _ in range(5):
@@ -165,7 +166,7 @@ class MicroEPSO:
                     bestSolutions = list(solutions)
                 del solutions[:]
 
-        elif first_population_criteria == 'diversity':
+        elif population_criteria == 'diversity':
             mostDiverse = self.evaluate_solutions_diversity(solutions)
 
             for _ in range(5):
@@ -206,21 +207,35 @@ class MicroEPSO:
 
         # Select the best random population among 5 populations
         bestSolutions = list(solutions)
-        bestCost = self.evaluate_solutions_average_cost(solutions)
 
-        for _ in range(5):
-            solutions = Particle.random_solutions(self.nvars, self.search_space, self.population_size)
-            cost = self.evaluate_solutions_average_cost(solutions)
-            if cost < bestCost:
-                bestCost = cost
-                bestSolutions = list(solutions)
-            del solutions[:]
+        if self.__population_criteria == 'average_cost':
+            bestCost = self.evaluate_solutions_average_cost(solutions)
 
-        # creates the particles and initialization of swap sequences in all the particles
+            for _ in range(5):
+                solutions = Particle.random_solutions(
+                    self.nvars, self.search_space, self.population_size)
+                cost = self.evaluate_solutions_average_cost(solutions)
+                if cost < bestCost:
+                    bestCost = cost
+                    bestSolutions = list(solutions)
+                del solutions[:]
+
+        elif self.__population_criteria == 'diversity':
+            mostDiverse = self.evaluate_solutions_diversity(solutions)
+
+            for _ in range(5):
+                solutions = Particle.random_solutions(
+                    self.nvars, self.search_space, self.population_size)
+                sim = self.evaluate_solutions_diversity(solutions)
+                if sim > mostDiverse:
+                    mostDiverse = sim
+                    bestSolutions = list(solutions)
+                del solutions[:]
+
+        # creates the particles
         for solution in bestSolutions:
             # creates a new particle
-            particle = Particle(solution=solution,
-                                cost=self.cost_function(*solution))
+            particle = Particle(solution=solution, cost=self.cost_function(*solution))
             # add the particle
             self.particles.append(particle)
 
@@ -685,7 +700,7 @@ if __name__ == "__main__":
             for i in range(30):
                 results = []
                 start_time = process_time()
-                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=10, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
+                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=20, beta=0.9, alfa=0.6, population_criteria='diversity', crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
                 results.append(function.__name__)
