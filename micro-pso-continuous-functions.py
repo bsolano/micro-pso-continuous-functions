@@ -10,6 +10,8 @@
 # Date: June 6, 2018. April-May 2022
 ####################################################################################
 
+from __future__ import annotations
+
 import random
 import sys
 import copy
@@ -29,10 +31,16 @@ import numpy as np
 np.random.seed(0)
 random.seed(0)
 
+# Define Chromosome as a subclass of list
+class Chromosome(list):
+    def __init__(self):
+        self.elements = []
+
+
 # class that represents a particle
 class Particle:
 
-    def __init__(self, solution, cost):
+    def __init__(self, solution: Chromosome, cost: float):
 
         # particle is a solution
         self.__solution = solution
@@ -49,46 +57,46 @@ class Particle:
 
     # returns the pbest
     @property
-    def best_particle(self):
+    def best_particle(self) -> Particle:
         return self.__best_particle
 
     # set pbest
     @best_particle.setter
-    def best_particle(self, new_best_particle):
+    def best_particle(self, new_best_particle: Particle):
         self.__best_particle = new_best_particle
 
     # gets solution
     @property
-    def solution(self):
+    def solution(self) -> Chromosome:
         return self.__solution
 
     # set solution
     @solution.setter
-    def solution(self, solution):
+    def solution(self, solution: Chromosome):
         self.__solution = solution
 
     # gets cost pbest solution
     @property
-    def best_particle_cost(self):
+    def best_particle_cost(self) -> cost:
         return self.__best_particle_cost
 
     # set cost pbest solution
     @best_particle_cost.setter
-    def best_particle_cost(self, cost):
+    def best_particle_cost(self, cost: float):
         self.__best_particle_cost = cost
 
     # gets cost current solution
     @property
-    def current_solution_cost(self):
+    def current_solution_cost(self) -> Chromosome:
         return self.__new_solution_cost
 
     # set cost current solution
     @current_solution_cost.setter
-    def current_solution_cost(self, cost):
+    def current_solution_cost(self, cost: float):
         self.__new_solution_cost = cost
 
     # gets random unique paths - returns a list of lists of paths
-    def random_solutions(size, search_space, max_size):
+    def random_solutions(size: int, search_space: tuple, max_size: int):
         random_solutions = []
 
         for _ in range(max_size):
@@ -102,7 +110,7 @@ class Particle:
 
     # Generate a random sequence and stores it
     # as a Route
-    def random_solution(size, search_space):
+    def random_solution(size: int, search_space: tuple):
         chromosome = Chromosome()
         min, max = search_space
         for _ in range(size):
@@ -113,7 +121,7 @@ class Particle:
 # MicroEPSO algorithm
 class MicroEPSO:
 
-    def __init__(self, cost_function, search_space, iterations, max_epochs, population_size, beta=1, alfa=1, first_population_criteria='average_cost', crossover_type='average_crossover', mutation_type='mutate_one_gene', mu=0.1, sigma=0.1, gamma=0.1):
+    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, first_population_criteria: str='average_cost', crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
         self.cost_function = cost_function  # the cost function
         # number of variables in the cost function
         self.nvars = len(signature(cost_function).parameters)
@@ -185,7 +193,7 @@ class MicroEPSO:
             elif self.__global_best.best_particle_cost > particle.best_particle_cost:
                 self.__global_best = copy.deepcopy(particle)
 
-    def init_population(self, population_size):
+    def init_population(self, population_size: int):
         self.particles = []  # list of particles
         solutions = Particle.random_solutions(
             self.nvars, self.search_space, population_size)
@@ -201,8 +209,7 @@ class MicroEPSO:
         bestCost = self.evaluate_solutions_average_cost(solutions)
 
         for _ in range(5):
-            solutions = Particle.random_solutions(
-                self.nvars, self.search_space, self.population_size)
+            solutions = Particle.random_solutions(self.nvars, self.search_space, self.population_size)
             cost = self.evaluate_solutions_average_cost(solutions)
             if cost < bestCost:
                 bestCost = cost
@@ -217,7 +224,7 @@ class MicroEPSO:
             # add the particle
             self.particles.append(particle)
 
-    def evaluate_solutions_diversity(self, solutions):
+    def evaluate_solutions_diversity(self, solutions: list[Chromosome]):
         simSum = 0
         count = 0
         for solution1 in solutions:
@@ -229,7 +236,7 @@ class MicroEPSO:
                     simSum += sim
         return simSum / count
 
-    def evaluate_solutions_average_cost(self, solutions):
+    def evaluate_solutions_average_cost(self, solutions: list[Chromosome]):
         totalCost = 0.0
         i = 0
         for solution in solutions:
@@ -241,55 +248,55 @@ class MicroEPSO:
 
     # returns gbest (best particle of the population)
     @property
-    def global_best(self):
+    def global_best(self) -> Particle:
         return self.__global_best
 
     # set gbest (best particle of the population)
     @global_best.setter
-    def global_best(self, new_global_best):
+    def global_best(self, new_global_best: Particle):
         self.__global_best = new_global_best
 
     @property
-    def epoch(self):
+    def epoch(self) -> int:
         return self.__last_epoch
 
     @epoch.setter
-    def epoch(self, last_epoch):
+    def epoch(self, last_epoch: int):
         self.__last_epoch = last_epoch
 
     # gets solution
-    def current_solutions(self):
+    def current_solutions(self) -> list[Chromosome]:
         return [particle.solution for particle in self.particles]
 
-    def mutation_probability(self, initial_probability=0.1, current_epoch=0, max_epochs=1000):
+    def mutation_probability(self, initial_probability: float=0.1, current_epoch: int=0, max_epochs: int=1000) -> float:
         alpha = max_epochs/log(initial_probability/10e-03)
         return initial_probability * exp(-current_epoch/alpha)
 
-    def neighborhood_size(self, initial_size, current_epoch=0, max_epochs=1000):
+    def neighborhood_size(self, initial_size: float, current_epoch: int=0, max_epochs: int=1000):
         alpha = max_epochs/log(initial_size/10e-02)
         return initial_size * exp(-current_epoch/alpha)
 
     # Mutation adding with probability mu a Gaussian perturbation with standard deviation sigma
-    def mutate(self, elite_solution, mu=0.1, sigma=0.1):
+    def mutate(self, elite_solution: Chromosome, mu: float=0.1, sigma: float=0.1):
         chromosome = [elite_solution[i]+sigma*random.random() if random.random() <= mu else elite_solution[i] for i in range(len(elite_solution))]
         return chromosome
 
     # mutates a randomly selected gene
-    def mutate_one_gene(self, elite_solution, min, max):
+    def mutate_one_gene(self, elite_solution: Chromosome, min: float, max: float):
         point = random.randint(0, len(elite_solution)-1)
         chromosome = elite_solution[:]
         chromosome[point] = np.random.uniform(min, max)
         return chromosome
 
     # Crossover operator
-    def crossover(self, dad_chromosome, mom_chromosome, gamma=0.1):
+    def crossover(self, dad_chromosome: Chromosome, mom_chromosome: Chromosome, gamma: float=0.1):
         alpha = [random.uniform(-gamma, 1+gamma)
                  for _ in range(len(dad_chromosome))]
         son_chromosome = [alpha[i]*dad_chromosome[i] + (1-alpha[i])*mom_chromosome[i] for i in range(len(dad_chromosome))]
         daugther_chromosome = [alpha[i]*mom_chromosome[i] + (1-alpha[i])*dad_chromosome[i] for i in range(len(dad_chromosome))]
         return son_chromosome
 
-    def average_crossover(self, dad_chromosome, mom_chromosome):
+    def average_crossover(self, dad_chromosome: Chromosome, mom_chromosome: Chromosome):
         """Average crossover mentioned in:
         Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74"""
         son_chromosome = list()
@@ -468,12 +475,6 @@ class MicroEPSO:
             plt.ylabel("Best cost")
             plt.plot(df['Epoch'], df['Best cost'])
             # plt.show()
-
-
-# Define Chromosome as a subclass of list
-class Chromosome(list):
-    def __init__(self):
-        self.elements = []
 
 
 if __name__ == "__main__":
