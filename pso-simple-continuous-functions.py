@@ -158,13 +158,14 @@ class PSO:
 
         # Select the best random population among 5 populations
         best_solutions = list(solutions)
-        best_cost = self.evaluate_solutions_average_cost(solutions)
+        most_diverse = self.evaluate_solutions_diversity(solutions)
+
         for _ in range(5):
             solutions = Particle.random_solutions(
-                self.nvars, search_space, self.population_size)
-            cost = self.evaluate_solutions_average_cost(solutions)
-            if cost < best_cost:
-                best_cost = cost
+                self.nvars, self.search_space, self.population_size)
+            sim = self.evaluate_solutions_diversity(solutions)
+            if sim > most_diverse:
+                most_diverse = sim
                 best_solutions = list(solutions)
             del solutions[:]
 
@@ -178,17 +179,17 @@ class PSO:
 
         self.__global_best = None
 
-    def evaluate_solutions_average_cost(self, solutions: list[Chromosome]) -> float:
-
-        total_cost = 0.0
-        i = 0
-        for solution in solutions:
-            cost = self.cost_function(*solution)
-            total_cost += cost
-            i += 1
-        average_cost = total_cost / float(i)
-
-        return average_cost
+    def evaluate_solutions_diversity(self, solutions: list[Chromosome]) -> float:
+        sim_sum = 0
+        count = 0
+        for solution1 in solutions:
+            for solution2 in solutions:
+                if not (solution1 == solution2):
+                    count += 1
+                    # Euclidean distance.  Best distance?
+                    sim = euclidean(solution1, solution2)
+                    sim_sum += sim
+        return sim_sum / count
 
     # returns gbest (best particle of the population)
     @property
