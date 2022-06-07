@@ -1,7 +1,7 @@
 # encoding:utf-8
 
 ####################################################################################
-# A Particle Swarm Optimization algorithm for solving the traveling salesman problem.
+# A Particle Swarm Optimization algorithm to find functions optimum.
 # The program reuses part of the code of Marco Castro (https://github.com/marcoscastro/tsp_pso)
 #
 # Author: Rafael Batres-Pietro
@@ -10,6 +10,8 @@
 #
 # Date: October 27, 2021.  April-May 2022
 ####################################################################################
+
+from __future__ import annotations
 
 import random
 import sys
@@ -28,10 +30,112 @@ import numpy as np
 np.random.seed(0)
 random.seed(0)
 
+# Define Chromosome as a subclass of list
+class Chromosome(list):
+    def __init__(self):
+        self.elements = []
+
+
+# class that represents a particle
+class Particle:
+
+    def __init__(self, solution, cost):
+
+        # current solution
+        self.__solution = solution
+
+        # best solution it has achieved so far by this particle
+        self.__best_particle = solution
+
+        # set costs
+        self.__new_solution_cost = cost
+        self.best_particle_cost = cost
+
+        # velocity of a particle is a tuple of
+        # n cost function variables
+        self.__velocity = [0 for _ in solution]
+
+    # returns the pbest
+    @property
+    def best_particle(self) -> Particle:
+        return self.__best_particle
+
+    # set pbest
+    @best_particle.setter
+    def best_particle(self, new_best_particle):
+        self.__best_particle = new_best_particle
+
+    # returns the velocity (sequence of swap operators)
+    @property
+    def velocity(self) -> list:
+        return self.__velocity
+
+    # set the new velocity (sequence of swap operators)
+    @velocity.setter
+    def velocity(self, new_velocity: list):
+        self.__velocity = new_velocity
+
+    # gets solution
+    @property
+    def solution(self) -> Chromosome:
+        return self.__solution
+
+    # set solution
+    @solution.setter
+    def solution(self, solution: Chromosome):
+        self.__solution = solution
+
+    # gets cost pbest solution
+    @property
+    def best_particle_cost(self) -> float:
+        return self.__best_particle_cost
+
+    # set cost pbest solution
+    @best_particle_cost.setter
+    def best_particle_cost(self, cost: float):
+        self.__best_particle_cost = cost
+
+    # gets cost current solution
+    @property
+    def current_solution_cost(self) -> Chromosome:
+        return self.__new_solution_cost
+
+    # set cost current solution
+    @current_solution_cost.setter
+    def current_solution_cost(self, cost: float):
+        self.__new_solution_cost = cost
+
+    # removes all elements of the list velocity
+    def clear_velocity(self):
+        del self.__velocity[:]
+
+    # gets random unique paths - returns a list of lists of paths
+    def random_solutions(size: int, search_space: tuple, max_size: int):
+        random_solutions = []
+
+        for _ in range(max_size):
+
+            list_temp = Particle.random_solution(size, search_space)
+
+            if list_temp not in random_solutions:
+                random_solutions.append(list_temp)
+
+        return random_solutions
+
+    # Generate a random sequence and stores it
+    # as a Route
+    def random_solution(size: int, search_space: tuple) -> Chromosome:
+        solution = []
+        min, max = search_space
+        for _ in range(size):
+            solution.append(np.random.uniform(min, max))
+        return solution
+
+
 # PSO algorithm
 class PSO:
 
-    def __init__(self, cost_function, search_space, iterations, population_size, inertia=0.8, particle_confidence=0.1, swarm_confidence=0.1):
+    def __init__(self, cost_function, search_space, iterations: int, population_size: int, inertia: float=0.8, particle_confidence: float=0.1, swarm_confidence: float=0.1):
         self.cost_function = cost_function  # the cost function
         # number of variables in the cost function
         self.nvars = len(signature(cost_function).parameters)
@@ -44,7 +148,7 @@ class PSO:
         self.s_confidence = swarm_confidence
 
         # initialized with a group of random particles (solutions)
-        solutions = Particle.getRandomSolutions(
+        solutions = Particle.random_solutions(
             self.nvars, search_space, self.population_size)
 
         # checks if exists any solution
@@ -53,264 +157,175 @@ class PSO:
             sys.exit(1)
 
         # Select the best random population among 5 populations
-        bestSolutions = list(solutions)
-        bestCost = self.evaluateSolutionsAverageCost(solutions)
+        best_solutions = list(solutions)
+        best_cost = self.evaluate_solutions_average_cost(solutions)
         for _ in range(5):
-            solutions = Particle.getRandomSolutions(
+            solutions = Particle.random_solutions(
                 self.nvars, search_space, self.population_size)
-            cost = self.evaluateSolutionsAverageCost(solutions)
-            if cost < bestCost:
-                bestCost = cost
-                bestSolutions = list(solutions)
+            cost = self.evaluate_solutions_average_cost(solutions)
+            if cost < best_cost:
+                best_cost = cost
+                best_solutions = list(solutions)
             del solutions[:]
 
         # creates the particles and initialization of swap sequences in all the particles
-        for solution in bestSolutions:
+        for solution in best_solutions:
             # creates a new particle
             particle = Particle(solution=solution,
                                 cost=self.cost_function(*solution))
             # add the particle
             self.particles.append(particle)
 
-        self.gbest = None
+        self.__global_best = None
 
-    def evaluateSolutionsAverageCost(self, solutions):
+    def evaluate_solutions_average_cost(self, solutions: list[Chromosome]) -> float:
 
-        totalCost = 0.0
+        total_cost = 0.0
         i = 0
         for solution in solutions:
             cost = self.cost_function(*solution)
-            totalCost += cost
+            total_cost += cost
             i += 1
-        averageCost = totalCost / float(i)
+        average_cost = total_cost / float(i)
 
-        return averageCost
-
-    # set gbest (best particle of the population)
-
-    def setGBest(self, new_gbest):
-        self.gbest = new_gbest
+        return average_cost
 
     # returns gbest (best particle of the population)
-    def getGBest(self):
-        return self.gbest
+    @property
+    def global_best(self) -> Particle:
+        return self.__global_best
+
+    # set gbest (best particle of the population)
+    @global_best.setter
+    def global_best(self, new_global_best: Particle):
+        self.__global_best = new_global_best
 
     # returns the elapsed milliseconds since the start of the program
-    def elapsedTime(self, start_time):
+    def elapsed_time(self, start_time):
         ms = (process_time() - start_time) * 1000.0
         return ms
 
-    def setIter(self, last_iter):
-        self.last_iter = last_iter
+    @property
+    def iteration(self) -> int:
+        return self.__last_iter
 
-    def getIter(self):
-        return self.last_iter
+    @iteration.setter
+    def iteration(self, last_iter: int):
+        self.__last_iter = last_iter
 
     def run(self):
         # variables for convergence data
-        convergenceData = []
-        iterationArray = []
-        bestCostArray = []
-        bestCostSampling = []
+        convergence_data = []
+        iteration_array = []
+        best_cost_array = []
+        best_cost_sampling = []
 
-        batchSize = 100  # save data every n iterations
-        batchCounter = 0
+        batch_size = 100  # save data every n iterations
+        batch_counter = 0
 
-        startTime = process_time()
+        start_time = process_time()
 
         # updates gbest (best particle of the population)
         for particle in self.particles:
-            if self.gbest is None:
-                self.gbest = copy.deepcopy(particle)
-            elif self.gbest.getCostPBest() > particle.getCostPBest():
-                self.gbest = copy.deepcopy(particle)
+            if self.global_best is None:
+                self.global_best = copy.deepcopy(particle)
+            elif self.global_best.best_particle_cost > particle.best_particle_cost:
+                self.global_best = copy.deepcopy(particle)
 
         # for each time step (iteration)
         iterations = self.iterations
         t = 0
         while t < iterations:
             # for t in range(self.iterations):
-            convergencePerIteration = []
-            batchCounter = batchCounter + 1
+            convergence_per_iteration = []
+            batch_counter = batch_counter + 1
 
             # for each particle in the swarm
             for particle in self.particles:
                 #previousCost = particle.getCurrentSolutionCost()
-                velocity = particle.getVelocity()
+                velocity = particle.velocity
                 # gets solution of the gbest solution
-                gbest = list(self.gbest.getPBest())
-                pbest = particle.getPBest()[:]  # copy of the pbest solution
+                gbest = list(self.global_best.best_particle)
+                pbest = particle.best_particle[:]  # copy of the pbest solution
                 # gets copy of the current solution of the particle
-                currentSolution = particle.getCurrentSolution()[:]
+                current_solution = particle.solution[:]
 
                 # updates velocity
                 r1 = random.random()
                 r2 = random.random()
                 velocity = [self.inertia*velocity[i] + self.p_confidence*r1*(
-                    pbest[i]-currentSolution[i]) + self.s_confidence*r2*(gbest[i]-currentSolution[i]) for i in range(len(velocity))]
-                particle.setVelocity(velocity)
+                    pbest[i]-current_solution[i]) + self.s_confidence*r2*(gbest[i]-current_solution[i]) for i in range(len(velocity))]
+                particle.velocity = velocity
 
                 # new solution
-                newSolution = [currentSolution[i] + velocity[i]
-                               for i in range(len(currentSolution))]
+                new_solution = [current_solution[i] + velocity[i]
+                               for i in range(len(current_solution))]
 
                 # If we collide with the limits, the limit is the solution and velocity is cero
                 for i in range(len(velocity)):
-                    if newSolution[i] < self.search_space[0]:
-                        newSolution[i] = self.search_space[0]
+                    if new_solution[i] < self.search_space[0]:
+                        new_solution[i] = self.search_space[0]
                         velocity[i] = 0.0
-                        particle.setVelocity(velocity)
+                        particle.velocity = velocity
 
-                    if newSolution[i] > self.search_space[1]:
-                        newSolution[i] = self.search_space[1]
+                    if new_solution[i] > self.search_space[1]:
+                        new_solution[i] = self.search_space[1]
                         velocity[i] = 0.0
-                        particle.setVelocity(velocity)
+                        particle.velocity = velocity
 
                 # gets cost of the current solution
-                newSolutionCost = self.cost_function(*newSolution)
+                new_solution_cost = self.cost_function(*new_solution)
                 # if newSolutionCost < previousCost:
                 # updates the current solution
-                particle.setCurrentSolution(newSolution)
+                particle.solution = new_solution
                 # updates the cost of the current solution
-                particle.setCostCurrentSolution(newSolutionCost)
+                particle.current_solution_cost = new_solution_cost
 
                 # checks if new solution is pbest solution
-                pbCost = particle.getCostPBest()
-                if newSolutionCost < pbCost:
-                    particle.setPBest(newSolution)
-                    particle.setCostPBest(newSolutionCost)
+                pb_cost = particle.best_particle_cost
+                if new_solution_cost < pb_cost:
+                    particle.best_particle = new_solution
+                    particle.best_particle_cost = new_solution_cost
 
-                gbestCost = self.gbest.getCostPBest()
+                gbest_cost = self.global_best.best_particle_cost
                 # check if new solution is gbest solution
-                if newSolutionCost < gbestCost:
-                    self.gbest = copy.deepcopy(particle)
+                if new_solution_cost < gbest_cost:
+                    self.global_best = copy.deepcopy(particle)
 
-                convergencePerIteration.append(t)
-                convergencePerIteration.append(self.gbest.getCostPBest())
-                convergenceData.append(convergencePerIteration)
-                iterationArray.append(t)
-                bestCostArray.append(self.gbest.getCostPBest())
+                convergence_per_iteration.append(t)
+                convergence_per_iteration.append(self.global_best.best_particle_cost)
+                convergence_data.append(convergence_per_iteration)
+                iteration_array.append(t)
+                best_cost_array.append(self.global_best.best_particle_cost)
 
-                if batchCounter > batchSize:
+                if batch_counter > batch_size:
                     print(t, "Gbest cost = ", "{:.20f}".format(
-                        self.gbest.getCostPBest()))
+                        self.global_best.best_particle_cost))
                     #print("Standard deviation: ", std)
-                    batchCounter = 0
-                    bestCostSampling.append(self.gbest.getCostPBest())
+                    batch_counter = 0
+                    best_cost_sampling.append(self.global_best.best_particle_cost)
 
             t = t + 1
             if t > 220:
-                std = np.std(bestCostSampling[-10:])
+                std = np.std(best_cost_sampling[-10:])
             else:
                 std = 1000
 
             if t == self.iterations:
-                self.setIter(t)
+                self.iteration = t
 
             if isclose(std, 0):
-                self.setIter(t)
+                self.iteration = t
                 break
 
         df = pd.DataFrame()
-        df['Iteration'] = pd.Series(iterationArray)
-        df['Best cost'] = pd.Series(bestCostArray)
+        df['Iteration'] = pd.Series(iteration_array)
+        df['Best cost'] = pd.Series(best_cost_array)
         plt.xlabel("Iteration No.")
         plt.ylabel("Best cost")
         plt.plot(df['Iteration'], df['Best cost'])
 
-        print("Elapsed time: ", self.elapsedTime(startTime))
-
-
-# class that represents a particle
-class Particle:
-
-    def __init__(self, solution, cost):
-
-        # current solution
-        self.solution = solution
-
-        # best solution it has achieved so far by this particle
-        self.pbest = solution
-
-        # set costs
-        self.newSolutionCost = cost
-        self.pbestCost = cost
-
-        # velocity of a particle is a tuple of
-        # n cost function variables
-        self.velocity = [0 for _ in solution]
-
-    # set pbest
-    def setPBest(self, new_pbest):
-        self.pbest = new_pbest
-
-    # returns the pbest
-    def getPBest(self):
-        return self.pbest
-
-    # set the new velocity (sequence of swap operators)
-    def setVelocity(self, new_velocity):
-        self.velocity = new_velocity
-
-    # returns the velocity (sequence of swap operators)
-    def getVelocity(self):
-        return self.velocity
-
-    # set solution
-    def setCurrentSolution(self, solution):
-        self.solution = solution
-
-    # gets solution
-    def getCurrentSolution(self):
-        return self.solution
-
-    # set cost pbest solution
-    def setCostPBest(self, cost):
-        self.pbestCost = cost
-
-    # gets cost pbest solution
-    def getCostPBest(self):
-        return self.pbestCost
-
-    # set cost current solution
-    def setCostCurrentSolution(self, cost):
-        self.newSolutionCost = cost
-
-    # gets cost current solution
-    def getCurrentSolutionCost(self):
-        return self.newSolutionCost
-
-    # removes all elements of the list velocity
-    def clearVelocity(self):
-        del self.velocity[:]
-
-    # gets random unique paths - returns a list of lists of paths
-    def getRandomSolutions(size, search_space, max_size):
-        random_solutions = []
-
-        for i in range(max_size):
-
-            list_temp = Particle.getRandomSolution(size, search_space)
-
-            if list_temp not in random_solutions:
-                random_solutions.append(list_temp)
-
-        return random_solutions
-
-    # Generate a random sequence and stores it
-    # as a Route
-    def getRandomSolution(size, search_space):
-        solution = []
-        min, max = search_space
-        for _ in range(size):
-            solution.append(np.random.uniform(min, max))
-        return solution
-
-
-# Define Chromosome as a subclass of list
-class Chromosome(list):
-    def __init__(self):
-        self.elements = []
+        print("Elapsed time: ", self.elapsed_time(start_time))
 
 
 if __name__ == "__main__":
@@ -333,45 +348,45 @@ if __name__ == "__main__":
                 results += functions_solution[function.__name__][0]
             else:
                 results += functions_solution[function.__name__]
-            results += pso.getGBest().getPBest()
+            results += pso.global_best.best_particle
             if isinstance(functions_solution[function.__name__][0], list):
                 min = np.inf
                 for solution in functions_solution[function.__name__]:
-                    euclidean_distance = euclidean(pso.getGBest().getPBest(), solution)
+                    euclidean_distance = euclidean(pso.global_best.best_particle, solution)
                     if euclidean_distance < min:
                         min = euclidean_distance
                 euclidean_distance = min
             else:
-                euclidean_distance = euclidean(pso.getGBest().getPBest(), functions_solution[function.__name__])
+                euclidean_distance = euclidean(pso.global_best.best_particle, functions_solution[function.__name__])
             results.append(euclidean_distance)
             results.append(1 if np.isclose(euclidean_distance, 0.0, atol=1e-05) else 0)
             if isinstance(functions_solution[function.__name__][0], list):
                 equal = 0
                 for solution in functions_solution[function.__name__]:
-                    if np.allclose(pso.getGBest().getPBest(), solution, atol=1e-05):
+                    if np.allclose(pso.global_best.best_particle, solution, atol=1e-05):
                         equal = 1
                         break
                 results.append(equal)
             else:
-                results.append(1 if np.allclose(pso.getGBest().getPBest(), functions_solution[function.__name__], atol=1e-05) else 0)
-            results.append(pso.getGBest().getCostPBest())
+                results.append(1 if np.allclose(pso.global_best.best_particle, functions_solution[function.__name__], atol=1e-05) else 0)
+            results.append(pso.global_best.best_particle_cost)
             if isinstance(functions_solution[function.__name__][0], list):
                 equal = 0
                 for solution in functions_solution[function.__name__]:
-                    if np.isclose(pso.getGBest().getCostPBest(), function(*solution), atol=1e-05):
+                    if np.isclose(pso.global_best.best_particle_cost, function(*solution), atol=1e-05):
                         equal = 1
                         break
                 results.append(equal)
             else:
-                results.append(1 if np.isclose(pso.getGBest().getCostPBest(), function(*functions_solution[function.__name__]), atol=1e-05) else 0)
-            iteration = pso.getIter()
+                results.append(1 if np.isclose(pso.global_best.best_particle_cost, function(*functions_solution[function.__name__]), atol=1e-05) else 0)
+            iteration = pso.iteration
             results.append(ms)
             results.append(iteration)
             fileoutput.append(results)
             # shows the global best particle
             print("Cost of gbest: ", "{:.20f}".format(
-                pso.getGBest().getCostPBest()))
-            print("gbest: ", pso.getGBest().getPBest())
+                pso.global_best.best_particle_cost))
+            print("gbest: ", pso.global_best.best_particle)
             print("")
 
         csvFile = open('results/pso-simple-continuous-function-'+function_name+'.csv', 'w', newline='')

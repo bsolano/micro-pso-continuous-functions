@@ -77,7 +77,7 @@ class Particle:
 
     # gets cost pbest solution
     @property
-    def best_particle_cost(self) -> cost:
+    def best_particle_cost(self) -> float:
         return self.__best_particle_cost
 
     # set cost pbest solution
@@ -110,7 +110,7 @@ class Particle:
 
     # Generate a random sequence and stores it
     # as a Route
-    def random_solution(size: int, search_space: tuple):
+    def random_solution(size: int, search_space: tuple) -> Chromosome:
         chromosome = Chromosome()
         min, max = search_space
         for _ in range(size):
@@ -204,41 +204,41 @@ class MicroEPSO:
             sys.exit(1)
 
         # Select the best random population among 5 populations
-        bestSolutions = list(solutions)
+        best_solutions = list(solutions)
 
         if self.__population_criteria == 'average_cost':
-            bestCost = self.evaluate_solutions_average_cost(solutions)
+            best_cost = self.evaluate_solutions_average_cost(solutions)
 
             for _ in range(5):
                 solutions = Particle.random_solutions(
                     self.nvars, self.search_space, self.population_size)
                 cost = self.evaluate_solutions_average_cost(solutions)
-                if cost < bestCost:
-                    bestCost = cost
-                    bestSolutions = list(solutions)
+                if cost < best_cost:
+                    best_cost = cost
+                    best_solutions = list(solutions)
                 del solutions[:]
 
         elif self.__population_criteria == 'diversity':
-            mostDiverse = self.evaluate_solutions_diversity(solutions)
+            most_diverse = self.evaluate_solutions_diversity(solutions)
 
             for _ in range(5):
                 solutions = Particle.random_solutions(
                     self.nvars, self.search_space, self.population_size)
                 sim = self.evaluate_solutions_diversity(solutions)
-                if sim > mostDiverse:
-                    mostDiverse = sim
-                    bestSolutions = list(solutions)
+                if sim > most_diverse:
+                    most_diverse = sim
+                    best_solutions = list(solutions)
                 del solutions[:]
 
         # creates the particles
-        for solution in bestSolutions:
+        for solution in best_solutions:
             # creates a new particle
             particle = Particle(solution=solution, cost=self.cost_function(*solution))
             # add the particle
             self.particles.append(particle)
 
-    def evaluate_solutions_diversity(self, solutions: list[Chromosome]):
-        simSum = 0
+    def evaluate_solutions_diversity(self, solutions: list[Chromosome]) -> float:
+        sim_sum = 0
         count = 0
         for solution1 in solutions:
             for solution2 in solutions:
@@ -246,18 +246,18 @@ class MicroEPSO:
                     count += 1
                     # Euclidean distance.  Best distance?
                     sim = euclidean(solution1, solution2)
-                    simSum += sim
-        return simSum / count
+                    sim_sum += sim
+        return sim_sum / count
 
-    def evaluate_solutions_average_cost(self, solutions: list[Chromosome]):
-        totalCost = 0.0
+    def evaluate_solutions_average_cost(self, solutions: list[Chromosome]) -> float:
+        total_cost = 0.0
         i = 0
         for solution in solutions:
             cost = self.cost_function(*solution)
-            totalCost += cost
+            total_cost += cost
             i += 1
-        averageCost = totalCost / float(i)
-        return averageCost
+        average_cost = total_cost / float(i)
+        return average_cost
 
     # returns gbest (best particle of the population)
     @property
