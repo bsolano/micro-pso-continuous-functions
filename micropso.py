@@ -493,7 +493,7 @@ if __name__ == "__main__":
     results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
     fileoutput = []
     fileoutput.append(results)
-    for i in range(1):
+    for i in range(30):
         results = []
         start_time = process_time()
         # creates a MicroEPSO instance
