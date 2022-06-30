@@ -344,7 +344,10 @@ class MicroEPSO:
             if epoch > 0:
                 self.init_population(self.population_size)
                 print("Particles: ", len(self.particles))
-                mutated_elite = getattr(self, self.mutation_type)(self.__global_best.best_particle, *self.search_space)
+                if self.mutation_type == 'mutate_one_gene':
+                    mutated_elite = getattr(self, self.mutation_type)(self.__global_best.best_particle, *self.search_space)
+                elif self.mutation_type == 'mutate':
+                    mutated_elite = getattr(self, self.mutation_type)(self.__global_best.best_particle, self.mutation_probability(self.mu, epoch, self.max_epochs), self.sigma)
                 position = random.randint(0, self.population_size-1)
                 self.particles[position] = Particle(mutated_elite, self.__global_best.best_particle_cost)
                 print("Inserted elite solution in position", position)
