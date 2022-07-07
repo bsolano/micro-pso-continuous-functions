@@ -4,7 +4,7 @@
 # A Particle Swarm Optimization algorithm to find functions optimum.
 #
 #
-# Author: Rafael Batres-Pietro
+# Author: Rafael Batres
 # Author: Braulio J. Solano-Rojas
 # Institution: Tecnológico de Monterrey
 # Date: June 6, 2018. April-May 2022

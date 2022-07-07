@@ -4,7 +4,7 @@
 # A Particle Swarm Optimization algorithm to find functions optimum.
 # The program reuses part of the code of Marco Castro (https://github.com/marcoscastro/tsp_pso)
 #
-# Author: Rafael Batres-Pietro
+# Author: Rafael Batres
 # Author: Braulio J. Solano-Rojas
 # Institution: Tecnologico de Monterrey
 #
