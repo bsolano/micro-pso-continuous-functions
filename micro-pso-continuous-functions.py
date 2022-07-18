@@ -401,7 +401,7 @@ class MicroEPSO:
                                 if new_daughter_solution[i] > self.search_space[1]:
                                     new_daughter_solution[i] = self.search_space[1]
 
-                            if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
+                            if random.random() <= 0.5:
                                 new_solution = new_son_solution
                             else:
                                 new_solution = new_daughter_solution
