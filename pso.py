@@ -384,8 +384,8 @@ if __name__ == "__main__":
                   iterations=175000, # max iterations
                   population_size=150, # population size
                   inertia=0.8, # inertia hyperparameter of PSO
-                  particle_confidence=1, # confidence in particles
-                  swarm_confidence=2) # confidence in the swarm
+                  particle_confidence=2.05, # confidence in particles
+                  swarm_confidence=2.05) # confidence in the swarm
         pso.run()  # runs the PSO algorithm
         ms = (process_time() - start_time) * 1000.0
 
