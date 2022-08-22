@@ -321,10 +321,11 @@ class MicroEPSO:
         return son_chromosome
 
     def roulette_wheel_selection(self) -> Particle:
+        max_fitness = max([particle.current_solution_cost for particle in self.particles])
         # Computes the population fitness
-        population_fitness = sum([1/particle.current_solution_cost for particle in self.particles])
+        population_fitness = sum([max_fitness-particle.current_solution_cost for particle in self.particles])
         # Computes for each particle the probability 
-        particle_probabilities = [(1/particle.current_solution_cost)/population_fitness for particle in self.particles]
+        particle_probabilities = [(max_fitness-particle.current_solution_cost)/population_fitness for particle in self.particles]
         # Selects one particle based on the computed probabilities
         return np.random.choice(self.particles, p=particle_probabilities)
         
