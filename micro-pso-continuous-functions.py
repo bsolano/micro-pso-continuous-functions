@@ -322,11 +322,9 @@ class MicroEPSO:
 
     def roulette_wheel_selection(self) -> Particle:
         # Computes the population fitness
-        population_fitness = sum([particle.current_solution_cost for particle in self.particles])
+        population_fitness = sum([1/particle.current_solution_cost for particle in self.particles])
         # Computes for each particle the probability 
-        particle_probabilities = [particle.current_solution_cost/population_fitness for particle in self.particles]
-        # Probabilities for a minimization problem
-        particle_probabilities = 1 - np.array(particle_probabilities)
+        particle_probabilities = [(1/particle.current_solution_cost)/population_fitness for particle in self.particles]
         # Selects one particle based on the computed probabilities
         return np.random.choice(self.particles, p=particle_probabilities)
         
