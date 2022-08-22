@@ -320,6 +320,16 @@ class MicroEPSO:
             son_chromosome.append((mom_chromosome[i]+dad_chromosome[i])/2)
         return son_chromosome
 
+    def roulette_wheel_selection(self) -> Particle:
+        # Computes the population fitness
+        population_fitness = sum([particle.current_solution_cost for particle in self.particles])
+        # Computes for each particle the probability 
+        particle_probabilities = [particle.current_solution_cost/population_fitness for particle in self.particles]
+        # Probabilities for a minimization problem
+        particle_probabilities = 1 - np.array(particle_probabilities)
+        # Selects one particle based on the computed probabilities
+        return np.random.choice(self.particles, p=particle_probabilities)
+        
     def run(self):
         # variables for convergence data
         convergence_data = []
@@ -370,18 +380,9 @@ class MicroEPSO:
                     if len(particle.history) == HISTORY_SIZE:
                         particle.history.pop(0)
 
-                    if self.mutation_type == 'mutate_one_gene':
-                        best_neighbor = getattr(self, self.mutation_type)(particle.solution, *self.search_space)
-                    elif self.mutation_type == 'mutate':
-                        best_neighbor = getattr(self, self.mutation_type)(particle.solution, self.mutation_probability(self.mu, epoch, self.max_epochs), self.sigma)
-
-                    for i in range(len(best_neighbor)):
-                        if best_neighbor[i] < self.search_space[0]:
-                            best_neighbor[i] = self.search_space[0]
-                        if best_neighbor[i] > self.search_space[1]:
-                            best_neighbor[i] = self.search_space[1]
-
-                    best_neighbor_cost = self.cost_function(*best_neighbor)
+                    best_neighbor_particle = self.roulette_wheel_selection()
+                    best_neighbor = best_neighbor_particle.solution
+                    best_neighbor_cost = best_neighbor_particle.current_solution_cost
 
                     new_solution = particle.solution[:]
 
