@@ -320,19 +320,22 @@ class MicroEPSO:
             son_chromosome.append((mom_chromosome[i]+dad_chromosome[i])/2)
         return son_chromosome
 
-    def roulette_wheel_selection(self) -> Particle:
-        max_fitness = max([particle.current_solution_cost for particle in self.particles])
-        # Computes the population fitness
-        population_fitness = sum([max_fitness-particle.current_solution_cost for particle in self.particles])
-
-        if population_fitness == 0:
-            # Selects one particle randomly
-            return np.random.choice(self.particles)
-        else:
-            # Computes for each particle the probability 
-            particle_probabilities = [(max_fitness-particle.current_solution_cost)/population_fitness for particle in self.particles]
-            # Selects one particle based on the computed probabilities
-            return np.random.choice(self.particles, p=particle_probabilities)
+    # Runs several “tournaments” each of which has a winner
+    # that is compared against a candidate selected at random
+    # If the candidate beats the candidate, then the 
+    # candidate becomes the winner.
+    def tournament_select(self) -> int:
+        # Use 10% of the population
+        tournament_size= int(round((self.population_size)*0.1))
+        winner = -1
+        winner_fitness = -1.0
+        for _ in range(0, tournament_size-1):
+          candidate = random.randint(0, (self.population_size)-1)
+          candidate_fitness = self.particles[candidate].current_solution_cost
+          if winner == -1 or candidate_fitness > winner_fitness:
+            winner = candidate
+            winner_fitness = candidate_fitness
+        return winner
         
     def run(self):
         # variables for convergence data
@@ -384,7 +387,8 @@ class MicroEPSO:
                     if len(particle.history) == HISTORY_SIZE:
                         particle.history.pop(0)
 
-                    best_neighbor_particle = self.roulette_wheel_selection()
+                    best_neighbor_id = self.tournament_select()
+                    best_neighbor_particle = self.particles[best_neighbor_id]
                     best_neighbor = best_neighbor_particle.solution
                     best_neighbor_cost = best_neighbor_particle.current_solution_cost
 
