@@ -320,16 +320,6 @@ class MicroEPSO:
             son_chromosome.append((mom_chromosome[i]+dad_chromosome[i])/2)
         return son_chromosome
 
-    def roulette_wheel_selection(self):
-        # Computes the population fitness
-        population_fitness = sum([particle.current_solution_cost for particle in self.particles])
-        # Computes for each particle the probability 
-        particle_probabilities = [particle.current_solution_cost/population_fitness for particle in self.particles]
-        # Probabilities for a minimization problem
-        particle_probabilities = 1 - np.array(particle_probabilities)
-        # Selects one particle based on the computed probabilities
-        return np.random.choice(self.particles, p=particle_probabilities)
-        
     def run(self):
         # variables for convergence data
         convergence_data = []
