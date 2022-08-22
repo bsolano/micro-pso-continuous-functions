@@ -324,10 +324,15 @@ class MicroEPSO:
         max_fitness = max([particle.current_solution_cost for particle in self.particles])
         # Computes the population fitness
         population_fitness = sum([max_fitness-particle.current_solution_cost for particle in self.particles])
-        # Computes for each particle the probability 
-        particle_probabilities = [(max_fitness-particle.current_solution_cost)/population_fitness for particle in self.particles]
-        # Selects one particle based on the computed probabilities
-        return np.random.choice(self.particles, p=particle_probabilities)
+
+        if population_fitness == 0:
+            # Selects one particle randomly
+            return np.random.choice(self.particles)
+        else:
+            # Computes for each particle the probability 
+            particle_probabilities = [(max_fitness-particle.current_solution_cost)/population_fitness for particle in self.particles]
+            # Selects one particle based on the computed probabilities
+            return np.random.choice(self.particles, p=particle_probabilities)
         
     def run(self):
         # variables for convergence data
