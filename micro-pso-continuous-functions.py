@@ -528,7 +528,7 @@ if __name__ == "__main__":
 
     # creates a PSO instance
     # beta is the probability for a global best movement
-    run_experiment = False
+    run_experiment = True
     if run_experiment == True:
         function_name = 'dejong_f4'
         function = globals()[function_name]
