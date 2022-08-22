@@ -530,7 +530,7 @@ if __name__ == "__main__":
     # beta is the probability for a global best movement
     run_experiment = False
     if run_experiment == True:
-        function_name = 'biggs_exp4'
+        function_name = 'dejong_f4'
         function = globals()[function_name]
         fileoutput = []
         results = ['Beta', 'Alfa', 'Iterations', 'Crossover type', 'Mutation type', 'Mu',
@@ -707,7 +707,7 @@ if __name__ == "__main__":
                     mutation_type = 'mutate_one_gene'
                 else:
                     mutation_type = 'mutate'
-                pso = MicroEPSO(function, functions_search_space[function.__name__], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(50 + (parameters[2] * (250 - 50))), crossover_type=crossover_type, mutation_type=mutation_type, mu=parameters[5], sigma=parameters[6], gamma=parameters[7])
+                pso = MicroEPSO(function, functions_search_space[function.__name__], max_epochs=500, population_size=10, beta=parameters[0], alfa=parameters[1], iterations=int(50 + (parameters[2] * (350 - 50))), crossover_type=crossover_type, mutation_type=mutation_type, mu=parameters[5], sigma=0.1 + (parameters[6] * (3.0 - 0.1)), gamma=0.1 + (parameters[7] * (3.0 - 0.1)))
                 pso.run()  # runs the PSO algorithm
                 cost = pso.global_best.best_particle_cost
                 results.append(cost)
