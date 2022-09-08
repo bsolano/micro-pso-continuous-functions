@@ -12,13 +12,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+import os
+import scipy.stats as st
 import random
 import sys
 import copy
 import csv
-import matplotlib.pyplot as plt
 import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.spatial.distance import euclidean
 from benchmark_functions import *
 from inspect import signature
@@ -95,21 +96,202 @@ class Particle:
     def current_solution_cost(self, cost: float):
         self.__new_solution_cost = cost
 
+    def getIndex(val,h,minVal=0.0,maxVal=1.0):
+        minIndex = int(float(minVal/h))
+        valIndex = int(float(val/h))-minIndex
+        return valIndex
+
+    def indexToEdge(dim,lEdge,h,minVal=0.0,maxVal=1.0):
+        rEdge = copy.deepcopy(lEdge)
+
+        for i in range(0,len(lEdge)):
+            for j in range(0,dim):
+                lEdge[i][j] = Particle.getFloatVal(lEdge[i][j],h)
+                rEdge[i][j] = lEdge[i][j]+h
+    
+        return lEdge,rEdge
+
+    def getFloatVal(index,h,minVal=0.0,maxVal=1.0):
+        return float(index*h+minVal)
+
+    def initializeSpace(dim,numStrata,minVal=0.0,maxVal=1.0,debug='False'):
+        dimList = []
+        for i in range(0,dim):
+            dimList.append(numStrata)    
+
+        h = float((maxVal-minVal)/(numStrata))
+
+        return h,Particle.getIndex(maxVal,h)
+
+    def buildList(dim,numStrata):
+        eligibleIndices = []
+        iList = []
+
+        for i in range(0,numStrata):
+            iList.append(i)
+    
+        for i in range(0,dim):
+            eligibleIndices.append(iList)    
+
+        return eligibleIndices
+
+    def getLimitedDraw(dim,eligibleIndices,history):
+        # set eligible indices for each dimension
+    
+        indices = copy.deepcopy(eligibleIndices)    
+
+        for ent in history:
+            for i in range(0,dim):
+                indices[i] = [x for x in indices[i] if x != ent[i]]
+
+        point = []
+        for i in range(0,dim):
+            point.append(random.choice(indices[i]))
+
+        return point, indices
+
+    def getDraw(dim,eligibleIndices,maxIndex,history):
+
+        eIndex = copy.deepcopy(eligibleIndices)
+
+        point = [0]*dim
+        while True:
+            if history == []:
+                # Initial random draw
+                point = [np.random.randint(0,maxIndex) for x in point]
+                history.append(point)
+                #print(len(history))
+                break
+            elif history != []:
+                # Limited draw by limiting sample-able indices
+                point,eIndex = Particle.getLimitedDraw(dim,eIndex,history)
+                history.append(point)
+                #print(len(history))
+                break                
+
+        return list(point),history,eIndex
+
+    def convertToRandomCDF(dim,history,h):
+        #Get bin left edge
+        leftEdge = copy.deepcopy(history)
+        rightEdge = copy.deepcopy(history)
+
+        #iterate over leftEdge, convert ints to floats
+    
+        leftEdge, rightEdge = Particle.indexToEdge(dim,leftEdge,h)
+
+        randCDFVal = copy.deepcopy(leftEdge)
+
+        for i in range(0,len(leftEdge)):
+            for j in range(0,dim):
+                randCDFVal[i][j] = float(np.random.uniform(leftEdge[i][j],0.999999*rightEdge[i][j],1))
+ 
+        return randCDFVal
+
+    def CDFtoNorm(CDF):
+        dim = len(CDF[0])
+        CDF = copy.deepcopy(CDF)
+        for i in range(0,len(CDF)):
+            for j in range(0,dim):
+                CDF[i][j] = st.norm.ppf(CDF[i][j])
+
+        return CDF
+        
+    def wtf(data,filename):
+        f = open(filename,'w')
+        for ent in data:
+            for thing in ent:
+                f.write(str(thing)+',')
+            f.write('\n')
+        f.close()
+
+    def sample(dim,numSamples,ratio):
+        numStrata = numSamples
+
+        # Try getting different random points in the array space
+        #   to satisfy nearest-neighbor constraint
+        # In 3 tries, get another LH sample and go again
+        sampleNum = 0
+        while True:
+            history = []
+
+            h,maxIndex = Particle.initializeSpace(dim,numStrata)
+            eIndices = Particle.buildList(dim,numStrata)
+            # Maximum radius within a single cell
+            minRadius = h*np.sqrt(dim)
+
+            for _ in range(0,numSamples):
+                _,history,eIndices = Particle.getDraw(dim,eIndices,maxIndex,history)
+            sampleNum += 1
+            #print("Sampling Latin-Hypercube array space (%s)" %(sampleNum))
+            tries = 0
+            while True:
+                randUniform = Particle.convertToRandomCDF(dim,history,h)
+                randStandardNorm = Particle.CDFtoNorm(randUniform)
+                tries += 1
+
+                Particle.wtf(randUniform,'utemp.csv')
+                Particle.wtf(randStandardNorm,'ntemp.csv')
+
+                cols = range(0,dim)
+                randUniform = np.genfromtxt('utemp.csv',delimiter=',',usecols=cols)
+                randStandardNorm = np.genfromtxt('ntemp.csv',delimiter=',',usecols=cols)
+    
+                uninnd = Particle.nnd(randUniform)
+                normnnd = Particle.nnd(randStandardNorm)
+                sampleMin = np.nanmin(uninnd)
+                sampleMinNorm = np.nanmin(normnnd)
+                #print(sampleMin,sampleMinNorm,ratio*minRadius)
+
+                if tries == 3:
+                    break
+                if sampleMin > ratio*minRadius and sampleMinNorm > ratio*minRadius:
+                    break
+            if sampleMin > ratio*minRadius and sampleMinNorm > ratio*minRadius:
+                break
+
+        os.remove(os.getcwd()+'/utemp.csv')
+        os.remove(os.getcwd()+'/ntemp.csv')
+
+        return randUniform,randStandardNorm
+
+    def nnd(a):
+        # For each sample, get the nearest neighbor w.r.t. each variable
+        b = np.zeros((a.shape[0],a.shape[0]),dtype=float)
+        for i in range(0,b.shape[0]):
+            for j in range(0,b.shape[0]):
+                b[i,j] = Particle.radius(a[j,:] - a[i,:])
+                if i == j:
+                    b[i,j] = 10e3
+        return b
+
+    def radius(v):
+        a = np.nansum(v*v)
+        return np.sqrt(a)
+
     # gets random unique paths - returns a list of lists of paths
     def random_solutions(size: int, search_space: tuple, max_size: int):
-        random_solutions = []
+        min, max = search_space
+        uni, _ = Particle.sample(size,max_size,1)
+        
+        samples = []
+        for elem in uni:
+            lt = list(elem)
+            chromosome = Chromosome()
+            chromosome = copy.deepcopy(lt)
+            samples.append(chromosome)
 
-        for _ in range(max_size):
+        for sample in samples:
+            for k in range(size):
+                sample[k] *= max - min
 
-            list_temp = Particle.random_solution(size, search_space)
+        for sample in samples:
+            for k in range(size):
+                sample[k] += min
+                
+        return samples
 
-            if list_temp not in random_solutions:
-                random_solutions.append(list_temp)
-
-        return random_solutions
-
-    # Generate a random sequence and stores it
-    # as a Route
+    # Generate a random chromosome of continuous values
     def random_solution(size: int, search_space: tuple) -> Chromosome:
         chromosome = Chromosome()
         min, max = search_space
@@ -121,7 +303,7 @@ class Particle:
 # MicroEPSO algorithm
 class MicroEPSO:
 
-    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, population_criteria: str='average_cost', crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
+    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
         self.cost_function = cost_function  # the cost function
         # number of variables in the cost function
         self.nvars = len(signature(cost_function).parameters)
@@ -134,7 +316,6 @@ class MicroEPSO:
         self.beta = beta
         # the probability that all swap operators in swap sequence (pbest - x(t-1))
         self.alfa = alfa
-        self.__population_criteria = population_criteria
         self.__last_epoch = 0
         self.crossover_type = crossover_type
         self.mutation_type = mutation_type
@@ -151,39 +332,11 @@ class MicroEPSO:
             print('Initial population empty! Try run the algorithm again...')
             sys.exit(1)
 
-        # Select the best random population among 5 populations
-        bestSolutions = list(solutions)
-
-        if self.__population_criteria == 'average_cost':
-            bestCost = self.evaluate_solutions_average_cost(solutions)
-
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                cost = self.evaluate_solutions_average_cost(solutions)
-                if cost < bestCost:
-                    bestCost = cost
-                    bestSolutions = list(solutions)
-                del solutions[:]
-
-        elif self.__population_criteria == 'diversity':
-            mostDiverse = self.evaluate_solutions_diversity(solutions)
-
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                sim = self.evaluate_solutions_diversity(solutions)
-                if sim > mostDiverse:
-                    mostDiverse = sim
-                    bestSolutions = list(solutions)
-                del solutions[:]
-
         self.__global_best = None
         # initialization of all particles
-        for solution in bestSolutions:
+        for solution in solutions:
             # creates a new particle
-            particle = Particle(solution=solution,
-                                cost=self.cost_function(*solution))
+            particle = Particle(solution=solution, cost=self.cost_function(*solution))
             # add the particle
             self.particles.append(particle)
             # updates gbest if needed
@@ -203,35 +356,8 @@ class MicroEPSO:
             print('Initial population empty! Try run the algorithm again...')
             sys.exit(1)
 
-        # Select the best random population among 5 populations
-        best_solutions = list(solutions)
-
-        if self.__population_criteria == 'average_cost':
-            best_cost = self.evaluate_solutions_average_cost(solutions)
-
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                cost = self.evaluate_solutions_average_cost(solutions)
-                if cost < best_cost:
-                    best_cost = cost
-                    best_solutions = list(solutions)
-                del solutions[:]
-
-        elif self.__population_criteria == 'diversity':
-            most_diverse = self.evaluate_solutions_diversity(solutions)
-
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                sim = self.evaluate_solutions_diversity(solutions)
-                if sim > most_diverse:
-                    most_diverse = sim
-                    best_solutions = list(solutions)
-                del solutions[:]
-
         # creates the particles
-        for solution in best_solutions:
+        for solution in solutions:
             # creates a new particle
             particle = Particle(solution=solution, cost=self.cost_function(*solution))
             # add the particle
@@ -320,14 +446,35 @@ class MicroEPSO:
             son_chromosome.append((mom_chromosome[i]+dad_chromosome[i])/2)
         return son_chromosome
 
+    # Runs several “tournaments” each of which has a winner
+    # that is compared against a candidate selected at random
+    # If the candidate beats the candidate, then the 
+    # candidate becomes the winner.
+    def select(self):
+        # Use 10% of the population
+        tournament_size= int(round((self.population_size)*0.1))
+        winner = -1
+        winnerFitness = -1.0
+        for i in range(0, tournament_size-1):
+          candidate = random.randint(0, (self.population_size)-1)
+          candidateFitness = self.particles[candidate].current_solution_cost
+          #.getFitness()
+          if winner == -1 or candidateFitness > winnerFitness:
+            winner = candidate
+            winnerFitness = candidateFitness
+        
+        return winner
+
     def run(self):
         # variables for convergence data
         convergence_data = []
         iteration_array = []
         best_cost_array = []
+        best_solution_array = []
         epoch_array = []
         epoch_best_cost_array = []
         best_cost_sampling = []
+        epoch_best_solution_array =[]
 
         batch_size = 100  # save data every n iterations
         batch_counter = 0
@@ -341,6 +488,7 @@ class MicroEPSO:
             print("Alfa = ", self.alfa, "Beta = ", self.beta)
             convergence_per_epoch = []
 
+            new_population = []
             if epoch > 0:
                 self.init_population(self.population_size)
                 print("Particles: ", len(self.particles))
@@ -357,39 +505,36 @@ class MicroEPSO:
                 convergence_per_iteration = []
                 batch_counter = batch_counter + 1
 
-                average_cost = np.mean([particle.best_particle_cost for particle in self.particles])
-                cost_std = np.std([particle.best_particle_cost for particle in self.particles])
+                # For elitist behavior along iterations select elitist = True
+                elitist = True
+                if t > 0 and epoch==0 and elitist:
+                    mutated_elite = self.mutate(self.__global_best.best_particle, self.mu, self.sigma)
+                    position = random.randint(0, self.population_size-1)
+                    self.particles[position] = Particle(mutated_elite, self.__global_best.best_particle_cost)
 
                 # for each particle in the swarm
                 for particle in self.particles:
-                    previous_cost = particle.current_solution_cost
-
-                    # gets solution of the gbest solution
-                    global_best = list(self.__global_best.best_particle)
+                    particle_solution = particle.solution[:]
+                    particle_pbest = particle.best_particle
 
                     if len(particle.history) == HISTORY_SIZE:
                         particle.history.pop(0)
 
-                    if self.mutation_type == 'mutate_one_gene':
-                        best_neighbor = getattr(self, self.mutation_type)(particle.solution, *self.search_space)
-                    elif self.mutation_type == 'mutate':
-                        best_neighbor = getattr(self, self.mutation_type)(particle.solution, self.mutation_probability(self.mu, epoch, self.max_epochs), self.sigma)
+                    best_neighbor_id = self.select()
+                    best_neighbor_particle = self.particles[best_neighbor_id]
+                    best_neighbor = best_neighbor_particle.solution
 
-                    for i in range(len(best_neighbor)):
-                        if best_neighbor[i] < self.search_space[0]:
-                            best_neighbor[i] = self.search_space[0]
-                        if best_neighbor[i] > self.search_space[1]:
-                            best_neighbor[i] = self.search_space[1]
+                    best_neighbor_cost = best_neighbor_particle.current_solution_cost
 
-                    best_neighbor_cost = self.cost_function(*best_neighbor)
-
-                    new_solution = particle.solution[:]
+                    mom_id = self.select()
+                    mom_particle = self.particles[mom_id]
+                    mom_solution = mom_particle.solution
 
                     if random.random() <= self.beta:
                         if self.crossover_type == 'average_crossover':
-                            new_solution = getattr(self, self.crossover_type)(list(new_solution), self.__global_best.best_particle)
+                            new_solution = getattr(self, self.crossover_type)(list(best_neighbor), self.__global_best.best_particle)
                         elif self.crossover_type == 'crossover':
-                            new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(list(new_solution), self.__global_best.best_particle, gamma=self.gamma)
+                            new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(list(best_neighbor), self.__global_best.best_particle, gamma=self.gamma)
 
                             for i in range(len(new_son_solution)):
                                 if new_son_solution[i] < self.search_space[0]:
@@ -401,95 +546,90 @@ class MicroEPSO:
                                 if new_daughter_solution[i] > self.search_space[1]:
                                     new_daughter_solution[i] = self.search_space[1]
 
-                            if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
-                                new_solution = new_son_solution
-                            else:
-                                new_solution = new_daughter_solution
+                            #if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
+                            #    new_solution = new_son_solution
+                            #else:
+                            #    new_solution = new_daughter_solution
 
+                        if random.random() <= 0.5:
+                            new_solution = new_son_solution
+                        else:
+                            new_solution = new_daughter_solution
+
+                        # gets cost of the current solution
+                        new_solution_cost = self.cost_function(*new_solution)
+                        # updates the current solution
+                        new_particle = Particle(solution=new_solution, cost=new_solution_cost)
+                        new_particle.current_solution_cost = new_solution_cost
+                        
+                    # alpha is the probability for a position change based on local best
                     elif random.random() <= self.alfa:
-                        largest_dist = 0
-                        for neighbor_particle in self.particles:
-                            sol = neighbor_particle.best_particle
-                            dist = euclidean(global_best, sol)
-
-                            if dist > largest_dist:
-                                largest_dist = dist
-                                dissimilar_particle = neighbor_particle
 
                         if self.crossover_type == 'average_crossover':
                             new_solution = getattr(self, self.crossover_type)(
-                                list(new_solution), dissimilar_particle.best_particle)
+                                list(particle_pbest), particle_solution)
 
                         elif self.crossover_type == 'crossover':
                             new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(
-                                list(new_solution), dissimilar_particle.best_particle, gamma=self.gamma)
+                                list(particle_pbest), particle_solution, gamma=self.gamma)
 
-                            for i in range(len(new_son_solution)):
-                                if new_son_solution[i] < self.search_space[0]:
-                                    new_son_solution[i] = self.search_space[0]
-                                if new_daughter_solution[i] < self.search_space[0]:
-                                    new_daughter_solution[i] = self.search_space[0]
-                                if new_son_solution[i] > self.search_space[1]:
-                                    new_son_solution[i] = self.search_space[1]
-                                if new_daughter_solution[i] > self.search_space[1]:
-                                    new_daughter_solution[i] = self.search_space[1]
+                        for i in range(len(new_son_solution)):
+                            if new_son_solution[i] < self.search_space[0]:
+                                new_son_solution[i] = self.search_space[0]
+                            if new_daughter_solution[i] < self.search_space[0]:
+                                new_daughter_solution[i] = self.search_space[0]
+                            if new_son_solution[i] > self.search_space[1]:
+                                new_son_solution[i] = self.search_space[1]
+                            if new_daughter_solution[i] > self.search_space[1]:
+                                new_daughter_solution[i] = self.search_space[1]
 
-                            if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
-                                new_solution = new_son_solution
-                            else:
-                                new_solution = new_daughter_solution
+                        if random.random() <= 0.5:
+                            new_solution = new_son_solution
+                        else:
+                            new_solution = new_daughter_solution
 
-                    for i in range(len(new_solution)):
-                        if new_solution[i] < self.search_space[0]:
-                            new_solution[i] = self.search_space[0]
-                        if new_solution[i] > self.search_space[1]:
-                            new_solution[i] = self.search_space[1]
-
-                    # gets cost of the current solution
-                    new_solution_cost = self.cost_function(*new_solution)
-
-                    if new_solution_cost < best_neighbor_cost:
-                        best_neighbor = new_solution[:]
-                        best_neighbor_cost = new_solution_cost
-
-                    if best_neighbor_cost < previous_cost and best_neighbor not in particle.history:
-                        # updates the current solution
-                        particle.solution = best_neighbor
-                        # updates the cost of the current solution
-                        particle.current_solution_cost = best_neighbor_cost
-                        particle.history.append(best_neighbor)
+                        # gets cost of the current solution
+                        new_solution_cost = self.cost_function(*new_solution)
+                        new_particle = Particle(solution=new_solution, cost=new_solution_cost)
+                        new_particle.current_solution_cost = new_solution_cost                        
+                    else:
+                        new_particle = Particle(particle.solution, particle.current_solution_cost)
+                        new_particle.current_solution_cost = particle.current_solution_cost
 
                     # checks if new solution is pbest solution
                     pbCost = particle.best_particle_cost
 
-                    if best_neighbor_cost < pbCost:
-                        particle.best_particle = best_neighbor
-                        particle.best_particle_cost = best_neighbor_cost
+                    if new_particle.current_solution_cost < pbCost:
+                        new_particle.best_particle = copy.deepcopy(new_particle.solution)
+                        new_particle.best_particle_cost = new_particle.current_solution_cost
+                    new_population.append(new_particle)
 
                     gbestCost = self.__global_best.best_particle_cost
 
                     # check if new solution is gbest solution
-                    if particle.current_solution_cost < gbestCost:
-                        self.__global_best = copy.deepcopy(particle)
+                    if new_particle.current_solution_cost < gbestCost:
+                        self.__global_best = copy.deepcopy(new_particle)
+                        print("Cost of global best: ", self.__global_best.best_particle_cost)
 
+                self.particles = list(new_population)
+                new_population = []
                 if batch_counter > batch_size:
-                    #print("Sum of acceptance probabilities:", sumAcceptanceProbabilities)
                     print(t, "Gbest cost = ", self.__global_best.best_particle_cost)
-                    convergence_per_iteration.append(t)
-                    convergence_per_iteration.append(self.__global_best.best_particle_cost)
-                    convergence_per_iteration.append(average_cost)
-                    convergence_per_iteration.append(cost_std)
-                    convergence_data.append(convergence_per_iteration)
-                    iteration_array.append(t)
-                    best_cost_array.append(self.__global_best.best_particle_cost)
-                    batch_counter = 0
-
-                if self.max_epochs > 1:
-                    convergence_per_epoch.append(epoch)
-                    convergence_per_epoch.append(self.__global_best.best_particle_cost)
-                    convergence_data.append(convergence_per_epoch)
-                    epoch_array.append(epoch)
-                    epoch_best_cost_array.append(self.__global_best.best_particle_cost)
+                print(t, "Gbest cost = ", self.__global_best.best_particle_cost)
+                convergence_per_iteration.append(t)
+                convergence_per_iteration.append(self.__global_best.best_particle_cost)
+                convergence_data.append(convergence_per_iteration)
+                iteration_array.append(t)
+                best_cost_array.append(self.__global_best.best_particle_cost)
+                best_solution_array.append(self.__global_best.best_particle)
+                batch_counter = 0
+                
+            convergence_per_epoch.append(epoch)
+            convergence_per_epoch.append(self.__global_best.best_particle_cost)
+            convergence_data.append(convergence_per_epoch)
+            epoch_array.append(epoch)
+            epoch_best_cost_array.append(self.__global_best.best_particle_cost)
+            epoch_best_solution_array.append(self.__global_best.best_particle)
 
             epoch = epoch + 1
             self.epoch = epoch
@@ -507,21 +647,19 @@ class MicroEPSO:
         print("Cost of global best: ", self.__global_best.best_particle_cost)
         print("global best: ", self.__global_best.best_particle)
         print("")
+        now = datetime.now()
+        date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
+        convergence_file_name = "convergence_" + date_time + ".csv"
         df = pd.DataFrame()
-        if self.max_epochs == 1:
-            df['Iteration'] = pd.Series(iteration_array)
-            df['Best cost'] = pd.Series(best_cost_array)
-            plt.xlabel("Iteration No.")
-            plt.ylabel("Best cost")
-            plt.plot(df['Iteration'], df['Best cost'])
-            plt.show()
-        else:
-            df['Epoch'] = pd.Series(epoch_array)
-            df['Best cost'] = pd.Series(epoch_best_cost_array)
-            plt.xlabel("Epoch No.")
-            plt.ylabel("Best cost")
-            plt.plot(df['Epoch'], df['Best cost'])
-            # plt.show()
+        df['Iteration'] = pd.Series(iteration_array)
+        df['Best cost'] = pd.Series(best_cost_array)
+        df['Best solution'] = pd.Series(best_solution_array)
+        df.to_csv(convergence_file_name, index=False)
+        df_epoch = pd.DataFrame()
+        df_epoch['Epoch'] = pd.Series(epoch_array)
+        df_epoch['Best cost'] = pd.Series(epoch_best_cost_array)
+        df_epoch['Best solution'] = pd.Series(epoch_best_solution_array)
+        df_epoch.to_csv('epoch_convergence.csv', index=False)
 
 
 if __name__ == "__main__":
@@ -729,10 +867,10 @@ if __name__ == "__main__":
             results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
-            for i in range(30):
+            for i in range(1):
                 results = []
                 start_time = process_time()
-                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=20, beta=0.9, alfa=0.6, population_criteria='diversity', crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
+                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=250, max_epochs=500, population_size=20, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
                 results.append(function.__name__)
