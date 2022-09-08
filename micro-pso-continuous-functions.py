@@ -867,7 +867,7 @@ if __name__ == "__main__":
             results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Epochs']
             fileoutput = []
             fileoutput.append(results)
-            for i in range(1):
+            for i in range(30):
                 results = []
                 start_time = process_time()
                 pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=250, max_epochs=500, population_size=20, beta=0.9, alfa=0.6, crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
