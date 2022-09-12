@@ -303,7 +303,7 @@ class Particle:
 # MicroEPSO algorithm
 class MicroEPSO:
 
-    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1):
+    def __init__(self, cost_function, search_space, iterations: int, max_epochs: int, population_size: int, beta: float=1.0, alfa: float=1.0, crossover_type: str='average_crossover', mutation_type: str='mutate_one_gene', mu: float=0.1, sigma: float=0.1, gamma: float=0.1, convergence_analysis: bool=False):
         self.cost_function = cost_function  # the cost function
         # number of variables in the cost function
         self.nvars = len(signature(cost_function).parameters)
@@ -322,6 +322,7 @@ class MicroEPSO:
         self.mu = mu
         self.sigma = sigma
         self.gamma = gamma
+        self.__convergence_analysis = convergence_analysis
 
         # initialized with a group of random particles (solutions)
         solutions = Particle.random_solutions(self.nvars, search_space, self.population_size)
@@ -647,19 +648,20 @@ class MicroEPSO:
         print("Cost of global best: ", self.__global_best.best_particle_cost)
         print("global best: ", self.__global_best.best_particle)
         print("")
-        now = datetime.now()
-        date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
-        convergence_file_name = "convergence_" + date_time + ".csv"
-        df = pd.DataFrame()
-        df['Iteration'] = pd.Series(iteration_array)
-        df['Best cost'] = pd.Series(best_cost_array)
-        df['Best solution'] = pd.Series(best_solution_array)
-        df.to_csv(convergence_file_name, index=False)
-        df_epoch = pd.DataFrame()
-        df_epoch['Epoch'] = pd.Series(epoch_array)
-        df_epoch['Best cost'] = pd.Series(epoch_best_cost_array)
-        df_epoch['Best solution'] = pd.Series(epoch_best_solution_array)
-        df_epoch.to_csv('epoch_convergence.csv', index=False)
+        if self.__convergence_analysis:
+            now = datetime.now()
+            date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
+            convergence_file_name = "results/convergence_" + date_time + ".csv"
+            df = pd.DataFrame()
+            df['Iteration'] = pd.Series(iteration_array)
+            df['Best cost'] = pd.Series(best_cost_array)
+            df['Best solution'] = pd.Series(best_solution_array)
+            df.to_csv(convergence_file_name, index=False)
+            df_epoch = pd.DataFrame()
+            df_epoch['Epoch'] = pd.Series(epoch_array)
+            df_epoch['Best cost'] = pd.Series(epoch_best_cost_array)
+            df_epoch['Best solution'] = pd.Series(epoch_best_solution_array)
+            df_epoch.to_csv('results/epoch_convergence.csv', index=False)
 
 
 if __name__ == "__main__":
