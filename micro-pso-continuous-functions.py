@@ -384,10 +384,22 @@ class MicroEPSO:
                     best_neighbor_cost = self.cost_function(*best_neighbor)
 
                     new_solution = particle.solution[:]
+                    # gets cost of the current solution
+                    new_solution_cost = particle.current_solution_cost
 
                     if random.random() <= self.beta:
                         if self.crossover_type == 'average_crossover':
                             new_solution = getattr(self, self.crossover_type)(list(new_solution), self.__global_best.best_particle)
+
+                            for i in range(len(new_solution)):
+                                if new_solution[i] < self.search_space[0]:
+                                    new_solution[i] = self.search_space[0]
+                                if new_solution[i] > self.search_space[1]:
+                                    new_solution[i] = self.search_space[1]
+
+                            # gets cost of the current solution
+                            new_solution_cost = self.cost_function(*new_solution)
+
                         elif self.crossover_type == 'crossover':
                             new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(list(new_solution), self.__global_best.best_particle, gamma=self.gamma)
 
@@ -401,10 +413,17 @@ class MicroEPSO:
                                 if new_daughter_solution[i] > self.search_space[1]:
                                     new_daughter_solution[i] = self.search_space[1]
 
-                            if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
+                            new_son_solution_cost = self.cost_function(*new_son_solution)
+                            new_daughter_solution_cost = self.cost_function(*new_daughter_solution)
+
+                            if new_son_solution_cost < new_daughter_solution_cost:
                                 new_solution = new_son_solution
+                                # gets cost of the current solution
+                                new_solution_cost = new_son_solution_cost
                             else:
                                 new_solution = new_daughter_solution
+                                # gets cost of the current solution
+                                new_solution_cost = new_daughter_solution_cost
 
                     elif random.random() <= self.alfa:
                         largest_dist = 0
@@ -420,9 +439,17 @@ class MicroEPSO:
                             new_solution = getattr(self, self.crossover_type)(
                                 list(new_solution), dissimilar_particle.best_particle)
 
+                            for i in range(len(new_solution)):
+                                if new_solution[i] < self.search_space[0]:
+                                    new_solution[i] = self.search_space[0]
+                                if new_solution[i] > self.search_space[1]:
+                                    new_solution[i] = self.search_space[1]
+
+                            # gets cost of the current solution
+                            new_solution_cost = self.cost_function(*new_solution)
+
                         elif self.crossover_type == 'crossover':
-                            new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(
-                                list(new_solution), dissimilar_particle.best_particle, gamma=self.gamma)
+                            new_son_solution, new_daughter_solution = getattr(self, self.crossover_type)(list(new_solution), self.__global_best.best_particle, gamma=self.gamma)
 
                             for i in range(len(new_son_solution)):
                                 if new_son_solution[i] < self.search_space[0]:
@@ -434,19 +461,17 @@ class MicroEPSO:
                                 if new_daughter_solution[i] > self.search_space[1]:
                                     new_daughter_solution[i] = self.search_space[1]
 
-                            if self.cost_function(*new_son_solution) < self.cost_function(*new_daughter_solution):
+                            new_son_solution_cost = self.cost_function(*new_son_solution)
+                            new_daughter_solution_cost = self.cost_function(*new_daughter_solution)
+
+                            if new_son_solution_cost < new_daughter_solution_cost:
                                 new_solution = new_son_solution
+                                # gets cost of the current solution
+                                new_solution_cost = new_son_solution_cost
                             else:
                                 new_solution = new_daughter_solution
-
-                    for i in range(len(new_solution)):
-                        if new_solution[i] < self.search_space[0]:
-                            new_solution[i] = self.search_space[0]
-                        if new_solution[i] > self.search_space[1]:
-                            new_solution[i] = self.search_space[1]
-
-                    # gets cost of the current solution
-                    new_solution_cost = self.cost_function(*new_solution)
+                                # gets cost of the current solution
+                                new_solution_cost = new_daughter_solution_cost
 
                     if new_solution_cost < best_neighbor_cost:
                         best_neighbor = new_solution[:]
