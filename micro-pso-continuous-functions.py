@@ -525,12 +525,6 @@ class MicroEPSO:
                     best_neighbor_particle = self.particles[best_neighbor_id]
                     best_neighbor = best_neighbor_particle.solution
 
-                    best_neighbor_cost = best_neighbor_particle.current_solution_cost
-
-                    mom_id = self.select()
-                    mom_particle = self.particles[mom_id]
-                    mom_solution = mom_particle.solution
-
                     if random.random() <= self.beta:
                         if self.crossover_type == 'average_crossover':
                             new_solution = getattr(self, self.crossover_type)(list(best_neighbor), self.__global_best.best_particle)
@@ -552,10 +546,10 @@ class MicroEPSO:
                             #else:
                             #    new_solution = new_daughter_solution
 
-                        if random.random() <= 0.5:
-                            new_solution = new_son_solution
-                        else:
-                            new_solution = new_daughter_solution
+                            if random.random() <= 0.5:
+                                new_solution = new_son_solution
+                            else:
+                                new_solution = new_daughter_solution
 
                         # gets cost of the current solution
                         new_solution_cost = self.cost_function(*new_solution)
