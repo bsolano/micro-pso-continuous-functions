@@ -142,71 +142,19 @@ class MicroEPSO:
         self.sigma = sigma
         self.gamma = gamma
 
-        # initialized with a group of random particles (solutions)
-        solutions = Particle.random_solutions(self.nvars, search_space, self.population_size)
-        print("One initial solution: ", solutions[0])
-
-        # checks if exists any solution
-        if not solutions:
-            print('Initial population empty! Try run the algorithm again...')
-            sys.exit(1)
-
-        # Select the best random population among 5 populations
-        bestSolutions = list(solutions)
-
         if self.__population_criteria == 'average_cost':
-            bestCost = self.evaluate_solutions_average_cost(solutions)
+            # initialized with a group of random particles (solutions)
+            solutions = Particle.random_solutions(self.nvars, search_space, self.population_size)
+            print("One initial solution: ", solutions[0])
 
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                cost = self.evaluate_solutions_average_cost(solutions)
-                if cost < bestCost:
-                    bestCost = cost
-                    bestSolutions = list(solutions)
-                del solutions[:]
+            # checks if exists any solution
+            if not solutions:
+                print('Initial population empty! Try run the algorithm again...')
+                sys.exit(1)
 
-        elif self.__population_criteria == 'diversity':
-            mostDiverse = self.evaluate_solutions_diversity(solutions)
+            # Select the best random population among 5 populations
+            best_solutions = list(solutions)
 
-            for _ in range(5):
-                solutions = Particle.random_solutions(
-                    self.nvars, self.search_space, self.population_size)
-                sim = self.evaluate_solutions_diversity(solutions)
-                if sim > mostDiverse:
-                    mostDiverse = sim
-                    bestSolutions = list(solutions)
-                del solutions[:]
-
-        self.__global_best = None
-        # initialization of all particles
-        for solution in bestSolutions:
-            # creates a new particle
-            particle = Particle(solution=solution,
-                                cost=self.cost_function(*solution))
-            # add the particle
-            self.particles.append(particle)
-            # updates gbest if needed
-            if self.__global_best is None:
-                self.__global_best = copy.deepcopy(particle)
-            elif self.__global_best.best_particle_cost > particle.best_particle_cost:
-                self.__global_best = copy.deepcopy(particle)
-
-    def init_population(self, population_size: int):
-        self.particles = []  # list of particles
-        solutions = Particle.random_solutions(
-            self.nvars, self.search_space, population_size)
-        self.population_size = population_size
-
-        # checks if exists any solution
-        if not solutions:
-            print('Initial population empty! Try run the algorithm again...')
-            sys.exit(1)
-
-        # Select the best random population among 5 populations
-        best_solutions = list(solutions)
-
-        if self.__population_criteria == 'average_cost':
             best_cost = self.evaluate_solutions_average_cost(solutions)
 
             for _ in range(5):
@@ -219,16 +167,90 @@ class MicroEPSO:
                 del solutions[:]
 
         elif self.__population_criteria == 'diversity':
-            most_diverse = self.evaluate_solutions_diversity(solutions)
+            best_solutions = []
+            best_solutions.append(Particle.random_solution(self.nvars, self.search_space))
+            print("One initial solution: ", best_solutions[0])
+            h = 0.2 #treshold
+            for _ in range(self.population_size-1):
+                H = 0.0 # Entropy 
+                while H < h:
+                    chromosome = Particle.random_solution(self.nvars, self.search_space)
+                    new_solutions = list(best_solutions)
+                    new_solutions.append(chromosome)
+                    for j in range(self.nvars):
+                        for i in range(len(new_solutions)):
+                            sum = 0.0
+                            for k in range(1, len(new_solutions)):
+                                Pik = 1 - abs(new_solutions[i][j] - new_solutions[k][j])/(self.search_space[1]-self.search_space[0])
+                                sum += -Pik * log(Pik)
+                            H += sum
+                    H /= len(new_solutions)
+                if H >= h:
+                    best_solutions.append(chromosome)
+
+        self.__global_best = None
+        # initialization of all particles
+        for solution in best_solutions:
+            # creates a new particle
+            particle = Particle(solution=solution,
+                                cost=self.cost_function(*solution))
+            # add the particle
+            self.particles.append(particle)
+            # updates gbest if needed
+            if self.__global_best is None:
+                self.__global_best = copy.deepcopy(particle)
+            elif self.__global_best.best_particle_cost > particle.best_particle_cost:
+                self.__global_best = copy.deepcopy(particle)
+
+    def init_population(self):
+        self.particles = []  # list of particles
+
+        if self.__population_criteria == 'average_cost':
+            solutions = Particle.random_solutions(
+                self.nvars, self.search_space, self.population_size)
+
+            # checks if exists any solution
+            if not solutions:
+                print('Initial population empty! Try run the algorithm again...')
+                sys.exit(1)
+
+            # Select the best random population among 5 populations
+            best_solutions = list(solutions)
+
+            best_cost = self.evaluate_solutions_average_cost(solutions)
 
             for _ in range(5):
                 solutions = Particle.random_solutions(
                     self.nvars, self.search_space, self.population_size)
-                sim = self.evaluate_solutions_diversity(solutions)
-                if sim > most_diverse:
-                    most_diverse = sim
+                cost = self.evaluate_solutions_average_cost(solutions)
+                if cost < best_cost:
+                    best_cost = cost
                     best_solutions = list(solutions)
                 del solutions[:]
+
+        # Entropy diversity from Bessaou, M. and Siarry, P. (2001).
+        # A genetic algorithm with real-value coding to optimize multimodal
+        # continuous functions. Struct Multidisc Optim 23, 63–74
+        elif self.__population_criteria == 'diversity':
+            best_solutions = []
+            best_solutions.append(Particle.random_solution(self.nvars, self.search_space))
+            h = 0.2 #treshold
+            for _ in range(self.population_size-1):
+                H = 0.0 # Entropy 
+                while H < h:
+                    chromosome = Particle.random_solution(self.nvars, self.search_space)
+                    new_solutions = list(best_solutions)
+                    new_solutions.append(chromosome)
+                    for j in range(self.nvars):
+                        for i in range(len(new_solutions)):
+                            sum = 0.0
+                            for k in range(1, len(new_solutions)):
+                                Pik = 1 - abs(new_solutions[i][j] - new_solutions[k][j])/(self.search_space[1]-self.search_space[0])
+                                sum += -Pik * log(Pik)
+                            H += sum
+                    H /= len(new_solutions)
+                if H >= h:
+                    best_solutions.append(chromosome)
 
         # creates the particles
         for solution in best_solutions:
@@ -237,17 +259,6 @@ class MicroEPSO:
             # add the particle
             self.particles.append(particle)
 
-    def evaluate_solutions_diversity(self, solutions: list[Chromosome]) -> float:
-        sim_sum = 0
-        count = 0
-        for solution1 in solutions:
-            for solution2 in solutions:
-                if not (solution1 == solution2):
-                    count += 1
-                    # Euclidean distance.  Best distance?
-                    sim = euclidean(solution1, solution2)
-                    sim_sum += sim
-        return sim_sum / count
 
     def evaluate_solutions_average_cost(self, solutions: list[Chromosome]) -> float:
         total_cost = 0.0
@@ -342,7 +353,7 @@ class MicroEPSO:
             convergence_per_epoch = []
 
             if epoch > 0:
-                self.init_population(self.population_size)
+                self.init_population()
                 print("Particles: ", len(self.particles))
                 if self.mutation_type == 'mutate_one_gene':
                     mutated_elite = getattr(self, self.mutation_type)(self.__global_best.best_particle, *self.search_space)

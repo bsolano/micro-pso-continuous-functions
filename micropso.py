@@ -138,31 +138,35 @@ class MicroEPSO:
         self.sigma = sigma
         self.gamma = gamma
 
-        # initialized with a group of random particles (solutions)
-        solutions = Particle.random_solutions(self.nvars, search_space, self.population_size)
-        print("One initial solution: ", solutions[0])
+        search_space_min = self.search_space[0]
+        search_space_max = self.search_space[1]
 
-        # checks if exists any solution
-        if not solutions:
-            print('Initial population empty! Try run the algorithm again...')
-            sys.exit(1)
-
-        # Select the best random population among 5 populations
-        bestSolutions = list(solutions)
-        mostDiverse = self.evaluate_solutions_diversity(solutions)
-
-        for _ in range(5):
-            solutions = Particle.random_solutions(
-                self.nvars, self.search_space, self.population_size)
-            sim = self.evaluate_solutions_diversity(solutions)
-            if sim > mostDiverse:
-                mostDiverse = sim
-                bestSolutions = list(solutions)
-            del solutions[:]
+        # Selects the best population according to enntropy diversity from
+        # Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value
+        # coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74
+        best_solutions = []
+        best_solutions.append(Particle.random_solution(self.nvars, self.search_space))
+        h = 0.2 #treshold
+        for _ in range(self.population_size-1):
+            H = 0.0 # Entropy 
+            while H < h:
+                chromosome = Particle.random_solution(self.nvars, self.search_space)
+                new_solutions = list(best_solutions)
+                new_solutions.append(chromosome)
+                for j in range(self.nvars):
+                    for i in range(len(new_solutions)):
+                        sum = 0.0
+                        for k in range(1, len(new_solutions)):
+                            Pik = 1 - abs(new_solutions[i][j] - new_solutions[k][j])/(search_space_max[j]-search_space_min[j])
+                            sum += -Pik * log(Pik)
+                        H += sum
+                H /= len(new_solutions)
+            if H >= h:
+                best_solutions.append(chromosome)
 
         self.__global_best = None
         # initialization of all particles
-        for solution in bestSolutions:
+        for solution in best_solutions:
             # creates a new particle
             particle = Particle(solution=solution,
                                 cost=self.cost_function(*solution))
@@ -174,29 +178,34 @@ class MicroEPSO:
             elif self.__global_best.best_particle_cost > particle.best_particle_cost:
                 self.__global_best = copy.deepcopy(particle)
 
-    def init_population(self, population_size: int):
+    def init_population(self):
         self.particles = []  # list of particles
-        solutions = Particle.random_solutions(
-            self.nvars, self.search_space, population_size)
-        self.population_size = population_size
 
-        # checks if exists any solution
-        if not solutions:
-            print('Initial population empty! Try run the algorithm again...')
-            sys.exit(1)
+        search_space_min = self.search_space[0]
+        search_space_max = self.search_space[1]
 
-        # Select the best random population among 5 populations
-        best_solutions = list(solutions)
-        most_diverse = self.evaluate_solutions_diversity(solutions)
-
-        for _ in range(5):
-            solutions = Particle.random_solutions(
-                self.nvars, self.search_space, self.population_size)
-            sim = self.evaluate_solutions_diversity(solutions)
-            if sim > most_diverse:
-                most_diverse = sim
-                best_solutions = list(solutions)
-            del solutions[:]
+        # Selects the best population according to enntropy diversity from
+        # Bessaou, M. and Siarry, P. (2001). A genetic algorithm with real-value
+        # coding to optimize multimodal continuous functions. Struct Multidisc Optim 23, 63–74
+        best_solutions = []
+        best_solutions.append(Particle.random_solution(self.nvars, self.search_space))
+        h = 0.2 #treshold
+        for _ in range(self.population_size-1):
+            H = 0.0 # Entropy 
+            while H < h:
+                chromosome = Particle.random_solution(self.nvars, self.search_space)
+                new_solutions = list(best_solutions)
+                new_solutions.append(chromosome)
+                for j in range(self.nvars):
+                    for i in range(len(new_solutions)):
+                        sum = 0.0
+                        for k in range(1, len(new_solutions)):
+                            Pik = 1 - abs(new_solutions[i][j] - new_solutions[k][j])/(search_space_max[j]-search_space_min[j])
+                            sum += -Pik * log(Pik)
+                        H += sum
+                H /= len(new_solutions)
+            if H >= h:
+                best_solutions.append(chromosome)
 
         # creates the particles
         for solution in best_solutions:
@@ -281,7 +290,7 @@ class MicroEPSO:
             convergence_per_epoch = []
 
             if epoch > 0:
-                self.init_population(self.population_size)
+                self.init_population()
                 print("Particles: ", len(self.particles))
                 mutated_elite = self.mutate(self.__global_best.best_particle, self.mu, self.sigma)
                 position = random.randint(0, self.population_size-1)
