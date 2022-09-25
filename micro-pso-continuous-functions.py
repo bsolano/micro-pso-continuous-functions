@@ -768,7 +768,7 @@ if __name__ == "__main__":
             for i in range(30):
                 results = []
                 start_time = process_time()
-                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=20, beta=0.9, alfa=0.6, population_criteria='diversity', crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
+                pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=500, population_size=25, beta=0.9, alfa=0.6, population_criteria='diversity', crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
                 results.append(function.__name__)
