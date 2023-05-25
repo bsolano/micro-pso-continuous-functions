@@ -540,7 +540,7 @@ class MicroEPSO:
                 break
 
 
-        self.best_cost_array = best_cost_array
+        self.best_cost_array = epoch_best_cost_array
         print("What's going on?")
         print("Cost of global best: ", self.__global_best.best_particle_cost)
         print("global best: ", self.__global_best.best_particle)
