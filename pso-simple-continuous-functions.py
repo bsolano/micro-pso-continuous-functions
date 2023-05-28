@@ -293,18 +293,18 @@ class PSO:
                 if new_solution_cost < gbest_cost:
                     self.global_best = copy.deepcopy(particle)
 
-                convergence_per_iteration.append(t)
-                convergence_per_iteration.append(self.global_best.best_particle_cost)
-                convergence_data.append(convergence_per_iteration)
-                iteration_array.append(t)
-                best_cost_array.append(self.global_best.best_particle_cost)
-
                 if batch_counter > batch_size:
                     print(t, "Gbest cost = ", "{:.20f}".format(
                         self.global_best.best_particle_cost))
                     #print("Standard deviation: ", std)
                     batch_counter = 0
                     best_cost_sampling.append(self.global_best.best_particle_cost)
+
+            convergence_per_iteration.append(t)
+            convergence_per_iteration.append(self.global_best.best_particle_cost)
+            convergence_data.append(convergence_per_iteration)
+            iteration_array.append(t)
+            best_cost_array.append(self.global_best.best_particle_cost)
 
             t = t + 1
             if t > 220:

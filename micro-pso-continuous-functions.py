@@ -511,6 +511,9 @@ class MicroEPSO:
                 if batch_counter > batch_size:
                     #print("Sum of acceptance probabilities:", sumAcceptanceProbabilities)
                     print(t, "Gbest cost = ", self.__global_best.best_particle_cost)
+                    batch_counter = 0
+
+                if self.max_epochs == 1:
                     convergence_per_iteration.append(t)
                     convergence_per_iteration.append(self.__global_best.best_particle_cost)
                     convergence_per_iteration.append(average_cost)
@@ -518,14 +521,13 @@ class MicroEPSO:
                     convergence_data.append(convergence_per_iteration)
                     iteration_array.append(t)
                     best_cost_array.append(self.__global_best.best_particle_cost)
-                    batch_counter = 0
 
-                if self.max_epochs > 1:
-                    convergence_per_epoch.append(epoch)
-                    convergence_per_epoch.append(self.__global_best.best_particle_cost)
-                    convergence_data.append(convergence_per_epoch)
-                    epoch_array.append(epoch)
-                    epoch_best_cost_array.append(self.__global_best.best_particle_cost)
+            if self.max_epochs > 1:
+                convergence_per_epoch.append(epoch)
+                convergence_per_epoch.append(self.__global_best.best_particle_cost)
+                convergence_data.append(convergence_per_epoch)
+                epoch_array.append(epoch)
+                epoch_best_cost_array.append(self.__global_best.best_particle_cost)
 
             epoch = epoch + 1
             self.epoch = epoch
@@ -539,8 +541,7 @@ class MicroEPSO:
             if isclose(std, 0):
                 break
 
-
-        self.best_cost_array = epoch_best_cost_array
+        self.epoch_best_cost_array = epoch_best_cost_array
         print("What's going on?")
         print("Cost of global best: ", self.__global_best.best_particle_cost)
         print("global best: ", self.__global_best.best_particle)
