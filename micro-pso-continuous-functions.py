@@ -775,7 +775,7 @@ if __name__ == "__main__":
                 pso = MicroEPSO(function, functions_search_space[function.__name__], iterations=350, max_epochs=50, population_size=25, beta=0.9, alfa=0.6, population_criteria='diversity', crossover_type='crossover', mutation_type='mutate', mu=0.5, sigma=0.7, gamma=0.7)
                 pso.run()  # runs the PSO algorithm
                 ms = (process_time() - start_time) * 1000.0
-                convergence_data[-1].extend(pso.best_cost_array)
+                convergence_data[-1].extend(pso.epoch_best_cost_array)
                 results.append(function.__name__)
                 if isinstance(functions_solution[function.__name__][0], list):
                     results += functions_solution[function.__name__][0]
