@@ -347,7 +347,7 @@ if __name__ == "__main__":
             convergence_data.append(['Run '+str(i+1)])
             results = []
             start_time = process_time()
-            pso = PSO(function, functions_search_space[function.__name__], iterations=17500, population_size=150, inertia=0.8, particle_confidence=2.05, swarm_confidence=2.05)
+            pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=0.8, particle_confidence=2.05, swarm_confidence=2.05)
             pso.run()  # runs the PSO algorithm
             convergence_data[-1].extend(pso.sampled_best_cost_array)
             ms = (process_time() - start_time) * 1000.0
