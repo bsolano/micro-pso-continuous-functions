@@ -219,6 +219,7 @@ class PSO:
         convergence_data = []
         iteration_array = []
         best_cost_array = []
+        sampled_best_cost_array = []
         best_cost_sampling = []
 
         batch_size = 100  # save data every n iterations
@@ -305,6 +306,8 @@ class PSO:
             convergence_data.append(convergence_per_iteration)
             iteration_array.append(t)
             best_cost_array.append(self.global_best.best_particle_cost)
+            if (t % 349) == 0:
+                sampled_best_cost_array.append(self.global_best.best_particle_cost)
 
             t = t + 1
             if t > 220:
@@ -319,7 +322,7 @@ class PSO:
                 self.iteration = t
                 break
 
-        self.best_cost_array = best_cost_array
+        self.sampled_best_cost_array = sampled_best_cost_array
         df = pd.DataFrame()
         df['Iteration'] = pd.Series(iteration_array)
         df['Best cost'] = pd.Series(best_cost_array)
@@ -346,7 +349,7 @@ if __name__ == "__main__":
             start_time = process_time()
             pso = PSO(function, functions_search_space[function.__name__], iterations=17500, population_size=150, inertia=0.8, particle_confidence=2.05, swarm_confidence=2.05)
             pso.run()  # runs the PSO algorithm
-            convergence_data[-1].extend(pso.best_cost_array)
+            convergence_data[-1].extend(pso.sampled_best_cost_array)
             ms = (process_time() - start_time) * 1000.0
             results.append(function.__name__)
             if isinstance(functions_solution[function.__name__][0], list):
@@ -397,6 +400,8 @@ if __name__ == "__main__":
         # convergence.csv
         csvFile = open('results/pso-simple-continuous-function-'+function_name+'-convergence.csv', 'w', newline='')
         writer = csv.writer(csvFile)
+        max_iterations = max([len(v) for v in convergence_data])
+        convergence_data[0].extend([i*349 for i in range(max_iterations)])
         writer.writerows(convergence_data)
         csvFile.close()
 
