@@ -306,7 +306,7 @@ class PSO:
             convergence_data.append(convergence_per_iteration)
             iteration_array.append(t)
             best_cost_array.append(self.global_best.best_particle_cost)
-            if (t % 349) == 0:
+            if ((t+1) % 350) == 0:
                 sampled_best_cost_array.append(self.global_best.best_particle_cost)
 
             t = t + 1
@@ -401,7 +401,7 @@ if __name__ == "__main__":
         csvFile = open('results/pso-simple-continuous-function-'+function_name+'-convergence.csv', 'w', newline='')
         writer = csv.writer(csvFile)
         max_iterations = max([len(v) for v in convergence_data])
-        convergence_data[0].extend([i*349 for i in range(max_iterations)])
+        convergence_data[0].extend([0 if i== 0 else i*350-1 for i in range(max_iterations)])
         writer.writerows(convergence_data)
         csvFile.close()
 
