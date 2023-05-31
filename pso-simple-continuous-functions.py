@@ -338,7 +338,7 @@ if __name__ == "__main__":
     # creates a PSO instance
     # alfa is the probabiliy for a movement based on local best
     # beta is the probability for a movement based on the global best
-    for function_name in ['dejong_f3']: #'beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock2','rosenbrock3','rosenbrock4','rosenbrock5','rosenbrock6','rosenbrock7','rosenbrock8','rosenbrock9','rosenbrock10','rosenbrock11','rosenbrock12','rosenbrock13','rosenbrock14','rosenbrock15','rosenbrock16','rosenbrock17','rosenbrock18','rosenbrock19','rosenbrock20','rastringin20','griewank20'
+    for function_name in ['beale','biggs_exp2','biggs_exp3','biggs_exp4','biggs_exp5','biggs_exp6','cross_in_tray','drop_in_wave','dejong_f1','dejong_f2','dejong_f3','dejong_f4','dejong_f5','rosenbrock2','rosenbrock3','rosenbrock4','rosenbrock5','rosenbrock6','rosenbrock7','rosenbrock8','rosenbrock9','rosenbrock10','rosenbrock11','rosenbrock12','rosenbrock13','rosenbrock14','rosenbrock15','rosenbrock16','rosenbrock17','rosenbrock18','rosenbrock19','rosenbrock20','rastringin20','griewank20']:
         function = globals()[function_name]
         results = ['Function'] + ['OptimumSolution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Solution x'+str(i+1) for i in range(len(signature(function).parameters))] + ['Eucl. dist.', 'Exact solution', 'Exact solution (allclose)', 'Cost', 'Exact optimum', 'Comp. time', 'Iterations']
         convergence_data = [['Iteration']]
@@ -350,7 +350,7 @@ if __name__ == "__main__":
             start_time = process_time()
             pso = PSO(function, functions_search_space[function.__name__], iterations=175000, population_size=150, inertia=0.8, particle_confidence=2.05, swarm_confidence=2.05)
             pso.run()  # runs the PSO algorithm
-            convergence_data[-1].extend(pso.best_cost_array)
+            convergence_data[-1].extend(pso.sampled_best_cost_array)
             ms = (process_time() - start_time) * 1000.0
             results.append(function.__name__)
             if isinstance(functions_solution[function.__name__][0], list):
@@ -401,7 +401,7 @@ if __name__ == "__main__":
         # convergence.csv
         csvFile = open('results/pso-simple-continuous-function-'+function_name+'-convergence.csv', 'w', newline='')
         writer = csv.writer(csvFile)
-        max_iterations = max([len(v) for v in convergence_data])
+        max_iterations = max([len(v) for v in convergence_data])-1
         convergence_data[0].extend([0 if i== 0 else i*350-1 for i in range(max_iterations)])
         writer.writerows(convergence_data)
         csvFile.close()
